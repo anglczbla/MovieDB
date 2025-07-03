@@ -4,6 +4,9 @@ import SearchBar from './components/SearchBar';
 import MovieList from './components/MovieList';
 import MovieDetail from './components/MovieDetail';
 import Navigation from './components/Navigation';
+import GenreFilter from './components/GenreFilter';
+import PeopleList from './components/PeopleList';
+import TrendingSection from './components/TrendingSection';
 
 function App() {
   const { movies, loading, error, searchMovies } = useMovies();
@@ -21,6 +24,91 @@ function App() {
    const handleTabChange = (tab) => {
     setActiveTab(tab);
     setSelectedMovie(null);
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'popular':
+        return (
+          <MovieList
+            movies={movies}
+            loading={loading}
+            error={error}
+            onMovieClick={handleMovieClick}
+            title="Popular Movies"
+          />
+        );
+      
+      case 'search':
+        return (
+          <div className="space-y-6">
+            <SearchBar onSearch={searchMovies} />
+            <MovieList
+              movies={movies}
+              loading={loading}
+              error={error}
+              onMovieClick={handleMovieClick}
+              title="Search Results"
+            />
+          </div>
+        );
+      
+      case 'trending':
+        return (
+          <TrendingSection
+            onMovieClick={handleMovieClick}
+          />
+        );
+      
+      case 'genres':
+        return (
+          <div className="space-y-6">
+            <GenreFilter
+              selectedGenre={selectedGenre}
+              onGenreSelect={handleGenreSelect}
+            />
+            {selectedGenre && (
+              <MovieList
+                movies={movies}
+                loading={loading}
+                error={error}
+                onMovieClick={handleMovieClick}
+                title={`${selectedGenre.name} Movies`}
+              />
+            )}
+          </div>
+        );
+      
+      case 'people':
+        return (
+          <PeopleList />
+        );
+      
+      case 'top-rated':
+        return (
+          <MovieList
+            movies={movies}
+            loading={loading}
+            error={error}
+            onMovieClick={handleMovieClick}
+            title="Top Rated Movies"
+          />
+        );
+      
+      case 'upcoming':
+        return (
+          <MovieList
+            movies={movies}
+            loading={loading}
+            error={error}
+            onMovieClick={handleMovieClick}
+            title="Upcoming Movies"
+          />
+        );
+      
+      default:
+        return null;
+    }
   };
   
   return (
