@@ -1,5 +1,5 @@
 const API_KEY = import.meta.env.VITE_APP_TMDB_API_KEY;
-const BASE_URL =import.meta.env.VITE_APP_TMDB_BASE_URL;
+const BASE_URL = import.meta.env.VITE_APP_TMDB_BASE_URL;
 
 export const movieAPI = {
   // Ambil film populer
@@ -20,8 +20,13 @@ export const movieAPI = {
 
   // Detail film
   getMovieDetail: async (id) => {
+    const response = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`);
+    return response.json();
+  },
+
+  discoverByGenre: async (genreId) => {
     const response = await fetch(
-      `${BASE_URL}/movie/${id}?api_key=${API_KEY}`
+      `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}`
     );
     return response.json();
   },
@@ -32,5 +37,5 @@ export const movieAPI = {
       `${BASE_URL}/genre/movie/list?api_key=${API_KEY}`
     );
     return response.json();
-  }
+  },
 };

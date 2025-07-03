@@ -17,6 +17,7 @@ export const useMovies = () => {
       setLoading(true);
       const data = await movieAPI.getPopularMovies();
       setMovies(data.results);
+      setError(null); // Reset error on success
     } catch (err) {
       setError(`Gagal memuat film populer: ${err.message}`);
     } finally {
@@ -33,13 +34,32 @@ export const useMovies = () => {
     }
   };
 
+  // Perbaiki filterByGenre - gunakan movieAPI yang sudah ada
+  const filterByGenre = async (genreId) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Gunakan movieAPI.discoverByGenre atau implementasi yang sesuai
+      const data = await movieAPI.discoverByGenre(genreId);
+      setMovies(data.results);
+    } catch (err) {
+      setError(`Gagal memfilter film: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const searchMovies = async (query) => {
     try {
       setLoading(true);
+      setError(null);
+      
       if (query.trim() === '') {
         loadPopularMovies();
         return;
       }
+      
       const data = await movieAPI.searchMovies(query);
       setMovies(data.results);
     } catch (err) {
@@ -55,6 +75,7 @@ export const useMovies = () => {
     error,
     genres,
     searchMovies,
-    loadPopularMovies
+    loadPopularMovies,
+    filterByGenre
   };
 };
