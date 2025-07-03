@@ -3,10 +3,12 @@ import { useMovies } from './hooks/useMovie';
 import SearchBar from './components/SearchBar';
 import MovieList from './components/MovieList';
 import MovieDetail from './components/MovieDetail';
+import Navigation from './components/Navigation';
 
 function App() {
   const { movies, loading, error, searchMovies } = useMovies();
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [activeTab, setActiveTab] = useState('popular');
 
   const handleMovieClick = (movie) => {
     setSelectedMovie(movie);
@@ -16,8 +18,14 @@ function App() {
     setSelectedMovie(null);
   };
 
+   const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSelectedMovie(null);
+  };
+  
   return (
     <div className="min-h-screen bg-gray-100">
+
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-6">
@@ -26,6 +34,12 @@ function App() {
           </h1>
         </div>
       </header>
+
+       {/* Navigation */}
+      <Navigation
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+      />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -47,6 +61,7 @@ function App() {
       )}
     </div>
   );
+  
 }
 
 export default App;
