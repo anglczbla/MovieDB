@@ -6,6 +6,7 @@ export const useMovies = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [genres, setGenres] = useState([]);
+  const [currentDataType, setCurrentDataType] = useState('popular'); // Track data type
 
   useEffect(() => {
     loadPopularMovies();
@@ -17,9 +18,38 @@ export const useMovies = () => {
       setLoading(true);
       const data = await movieAPI.getPopularMovies();
       setMovies(data.results);
-      setError(null); // Reset error on success
+      setCurrentDataType('popular');
+      setError(null);
     } catch (err) {
       setError(`Gagal memuat film populer: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadTopRatedMovies = async () => {
+    try {
+      setLoading(true);
+      const data = await movieAPI.getTopRatedMovies();
+      setMovies(data.results);
+      setCurrentDataType('top-rated');
+      setError(null);
+    } catch (err) {
+      setError(`Gagal memuat film top rated: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadUpcomingMovies = async () => {
+    try {
+      setLoading(true);
+      const data = await movieAPI.getUpcomingMovies();
+      setMovies(data.results);
+      setCurrentDataType('upcoming');
+      setError(null);
+    } catch (err) {
+      setError(`Gagal memuat film upcoming: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -34,15 +64,15 @@ export const useMovies = () => {
     }
   };
 
-  // Perbaiki filterByGenre - gunakan movieAPI yang sudah ada
+  // Fungsi untuk memfilter film berdasarkan genre (menggunakan API)
   const filterByGenre = async (genreId) => {
     try {
       setLoading(true);
       setError(null);
       
-      // Gunakan movieAPI.discoverByGenre atau implementasi yang sesuai
       const data = await movieAPI.discoverByGenre(genreId);
       setMovies(data.results);
+      setCurrentDataType('genre');
     } catch (err) {
       setError(`Gagal memfilter film: ${err.message}`);
     } finally {
@@ -62,10 +92,25 @@ export const useMovies = () => {
       
       const data = await movieAPI.searchMovies(query);
       setMovies(data.results);
+      setCurrentDataType('search');
     } catch (err) {
       setError(`Gagal mencari film: ${err.message}`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fungsi untuk mendapatkan film berdasarkan tipe data
+  const loadMoviesByType = async (type) => {
+    switch (type) {
+      case 'popular':
+        return loadPopularMovies();
+      case 'top-rated':
+        return loadTopRatedMovies();
+      case 'upcoming':
+        return loadUpcomingMovies();
+      default:
+        return loadPopularMovies();
     }
   };
 
@@ -74,8 +119,12 @@ export const useMovies = () => {
     loading,
     error,
     genres,
+    currentDataType,
     searchMovies,
     loadPopularMovies,
-    filterByGenre
+    loadTopRatedMovies,
+    loadUpcomingMovies,
+    filterByGenre,
+    loadMoviesByType
   };
 };

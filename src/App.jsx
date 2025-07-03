@@ -9,7 +9,15 @@ import PeopleList from "./components/PeopleList";
 import TrendingSection from "./components/TrendingSection";
 
 function App() {
-  const { movies, loading, error, searchMovies } = useMovies();
+  const { 
+    movies, 
+    loading, 
+    error, 
+    searchMovies, 
+    loadMoviesByType, 
+    filterByGenre 
+  } = useMovies();
+  
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [activeTab, setActiveTab] = useState("popular");
   const [selectedGenre, setSelectedGenre] = useState(null);
@@ -25,11 +33,24 @@ function App() {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setSelectedMovie(null);
+    
+    // Reset genre dan load data sesuai tab
+    if (tab !== "genres") {
+      setSelectedGenre(null);
+      if (tab !== "search" && tab !== "trending" && tab !== "people") {
+        loadMoviesByType(tab);
+      }
+    }
   };
 
-  const handleGenreSelect = (genre) => {
+  const handleGenreSelect = async (genre) => {
     setSelectedGenre(genre);
     setActiveTab("genres");
+    
+    // Panggil API untuk mendapatkan film berdasarkan genre
+    if (genre && genre.id) {
+      await filterByGenre(genre.id);
+    }
   };
 
   const renderContent = () => {
@@ -69,15 +90,13 @@ function App() {
               selectedGenre={selectedGenre}
               onGenreSelect={handleGenreSelect}
             />
-            {selectedGenre && (
-              <MovieList
-                movies={movies}
-                loading={loading}
-                error={error}
-                onMovieClick={handleMovieClick}
-                title={`${selectedGenre.name} Movies`}
-              />
-            )}
+            <MovieList
+              movies={movies}
+              loading={loading}
+              error={error}
+              onMovieClick={handleMovieClick}
+              title={selectedGenre ? `${selectedGenre.name} Movies` : "Select a Genre"}
+            />
           </div>
         );
 
@@ -125,16 +144,9 @@ function App() {
       {/* Navigation */}
       <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
 
-      {/* Main Content */}
+       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {renderContent()}
-        <SearchBar onSearch={searchMovies} />
-        <MovieList
-          movies={movies}
-          loading={loading}
-          error={error}
-          onMovieClick={handleMovieClick}
-        />
       </main>
 
       {/* Movie Detail Modal */}
