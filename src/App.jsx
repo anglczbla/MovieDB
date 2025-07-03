@@ -149,9 +149,12 @@ function App() {
         {renderContent()}
       </main>
 
-      {/* Movie Detail Modal */}
+      {/* Movie Detail Modal dengan Video dan Images */}
       {selectedMovie && (
-        <MovieDetail movie={selectedMovie} onClose={handleCloseDetail} />
+        <MovieDetail 
+          movie={selectedMovie} 
+          onClose={handleCloseDetail} 
+        />
       )}
     </div>
   );

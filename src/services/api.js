@@ -20,7 +20,9 @@ export const movieAPI = {
 
   // Detail film
   getMovieDetail: async (id) => {
-    const response = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`);
+    const response = await fetch(
+      `${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`
+    );
     return response.json();
   },
 
@@ -92,6 +94,22 @@ export const movieAPI = {
   getUpcomingMovies: async (page = 1) => {
     const response = await fetch(
       `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=${page}`
+    );
+    return response.json();
+  },
+
+  // Ambil video film
+  getMovieVideos: async (movieId) => {
+    const response = await fetch(
+      `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`
+    );
+    return response.json();
+  },
+
+  // Ambil gambar film
+  getMovieImages: async (movieId) => {
+    const response = await fetch(
+      `${BASE_URL}/movie/${movieId}/images?api_key=${API_KEY}&language=en-US`
     );
     return response.json();
   },
