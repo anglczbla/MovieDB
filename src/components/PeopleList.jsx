@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { movieAPI } from '../api';
+import { movieAPI } from '../services/api';
 
 const PeopleList = () => {
   const [people, setPeople] = useState([]);
