@@ -16,6 +16,10 @@ export const useMovies = () => {
   const [videosError, setVideosError] = useState(null);
   const [imagesError, setImagesError] = useState(null);
 
+  const [movieCredits, setMovieCredits] = useState([]);
+  const [creditsLoading, setCreditsLoading] = useState(false);
+  const [creditsError, setCreditsError] = useState(null);
+
   useEffect(() => {
     loadPopularMovies();
     loadGenres();
@@ -169,14 +173,44 @@ export const useMovies = () => {
     }
   };
 
+  const loadMovieCredits = async (movieId) => {
+    setCreditsLoading(true);
+    setCreditsError(null);
+    try {
+      const data = await movieAPI.getMovieCredits(movieId);
+      setMovieCredits(data.cast || []);
+    } catch (err) {
+      setCreditsError(err.message);
+    } finally {
+      setCreditsLoading(false);
+    }
+  };
+
+  // Fungsi untuk mengambil kredit film berdasarkan personId
+  const getPersonMovieCredits = async (personId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await movieAPI.getPersonMovieCredits(personId);
+      setMovies(data.cast || []); // Hanya ambil bagian 'cast' untuk daftar film yang diperankan
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 🧹 FUNGSI BARU: Reset video dan gambar
   const resetMovieMedia = () => {
     setMovieVideos([]);
     setMovieImages([]);
+    setMovieCredits([]);
     setVideosError(null);
     setImagesError(null);
+    setCreditsError(null);
   };
 
+  
   return {
     // State utama
     movies,
@@ -188,10 +222,15 @@ export const useMovies = () => {
     // State video dan gambar
     movieVideos,
     movieImages,
+    movieCredits,
+
     videosLoading,
     imagesLoading,
+    creditsLoading,
+    
     videosError,
     imagesError,
+    creditsError,
     
     // Fungsi utama
     searchMovies,
@@ -200,10 +239,12 @@ export const useMovies = () => {
     loadUpcomingMovies,
     filterByGenre,
     loadMoviesByType,
+    getPersonMovieCredits,
     
     // Fungsi baru
     loadMovieVideos,
     loadMovieImages,
-    resetMovieMedia
+    resetMovieMedia,
+    loadMovieCredits,
   };
 };

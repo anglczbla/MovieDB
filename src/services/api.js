@@ -113,4 +113,18 @@ export const movieAPI = {
     );
     return response.json();
   },
+
+  getPersonMovieCredits: async (personId) => { // add cast 
+    const response = await fetch(
+      `${BASE_URL}/person/${personId}/movie_credits?api_key=${API_KEY}&language=en-US`
+    );
+    return response.json();
+  },
+
+   getMovieCredits: async (movieId) => {
+    const response = await fetch(
+      `${BASE_URL}/movie/${movieId}/credits?api_key=${API_KEY}&language=en-US`
+    );
+    return response.json();
+  },
 };

@@ -26,7 +26,7 @@ function App() {
     error, 
     searchMovies, 
     loadMoviesByType, 
-    filterByGenre 
+    filterByGenre,
   } = useMovies();
   
   const [selectedMovie, setSelectedMovie] = useState(null);

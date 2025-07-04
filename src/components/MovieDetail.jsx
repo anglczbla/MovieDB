@@ -5,23 +5,31 @@ const MovieDetail = ({ movie, onClose }) => {
   const {
     movieVideos,
     movieImages,
+    movieCredits, 
+
     videosLoading,
     imagesLoading,
+    creditsLoading, 
+
     videosError,
     imagesError,
+    creditsError, 
+
     loadMovieVideos,
     loadMovieImages,
+    loadMovieCredits, 
     resetMovieMedia,
   } = useMovies();
 
   const [activeTab, setActiveTab] = useState("info");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  // Load video dan gambar ketika modal dibuka
+  // Load video, gambar, dan cast ketika modal dibuka
   useEffect(() => {
     if (movie && movie.id) {
       loadMovieVideos(movie.id);
       loadMovieImages(movie.id);
+      loadMovieCredits(movie.id); // BARU: load cast data
     }
 
     // Cleanup saat modal ditutup
@@ -52,6 +60,12 @@ const MovieDetail = ({ movie, onClose }) => {
     return `https://image.tmdb.org/t/p/${size}${imagePath}`;
   };
 
+  // BARU: Function untuk mendapatkan profile picture cast
+  const getCastImageUrl = (profilePath, size = "w185") => {
+    if (!profilePath) return "/api/placeholder/185/278"; // placeholder jika tidak ada foto
+    return `https://image.tmdb.org/t/p/${size}${profilePath}`;
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "info":
@@ -74,12 +88,8 @@ const MovieDetail = ({ movie, onClose }) => {
                     <span className="text-green-400 font-bold">📅</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white">
-                      Tanggal Rilis
-                    </h4>
-                    <p className="text-gray-300">
-                      {formatDate(movie.release_date)}
-                    </p>
+                    <h4 className="font-semibold text-white">Tanggal Rilis</h4>
+                    <p className="text-gray-300">{formatDate(movie.release_date)}</p>
                   </div>
                 </div>
               </div>
@@ -91,9 +101,7 @@ const MovieDetail = ({ movie, onClose }) => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-white">Rating</h4>
-                    <p className="text-gray-300">
-                      {movie.vote_average.toFixed(1)}/10
-                    </p>
+                    <p className="text-gray-300">{movie.vote_average.toFixed(1)}/10</p>
                   </div>
                 </div>
               </div>
@@ -105,9 +113,7 @@ const MovieDetail = ({ movie, onClose }) => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-white">Popularitas</h4>
-                    <p className="text-gray-300">
-                      {Math.round(movie.popularity)}
-                    </p>
+                    <p className="text-gray-300">{Math.round(movie.popularity)}</p>
                   </div>
                 </div>
               </div>
@@ -119,9 +125,7 @@ const MovieDetail = ({ movie, onClose }) => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-white">Bahasa</h4>
-                    <p className="text-gray-300">
-                      {movie.original_language.toUpperCase()}
-                    </p>
+                    <p className="text-gray-300">{movie.original_language.toUpperCase()}</p>
                   </div>
                 </div>
               </div>
@@ -134,9 +138,7 @@ const MovieDetail = ({ movie, onClose }) => {
           <div className="space-y-6">
             <div className="flex items-center mb-6">
               <span className="w-1 h-6 bg-red-500 mr-3 rounded-full"></span>
-              <h3 className="text-xl font-bold text-white">
-                Trailer & Video
-              </h3>
+              <h3 className="text-xl font-bold text-white">Trailer & Video</h3>
             </div>
 
             {videosLoading && (
@@ -144,9 +146,7 @@ const MovieDetail = ({ movie, onClose }) => {
                 <div className="relative">
                   <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
                 </div>
-                <p className="mt-4 text-gray-300 font-medium">
-                  Memuat video...
-                </p>
+                <p className="mt-4 text-gray-300 font-medium">Memuat video...</p>
               </div>
             )}
 
@@ -160,23 +160,16 @@ const MovieDetail = ({ movie, onClose }) => {
             {!videosLoading && !videosError && movieVideos.length === 0 && (
               <div className="bg-white/10 border border-white/20 rounded-xl p-8 text-center">
                 <div className="text-gray-400 text-4xl mb-2">📺</div>
-                <p className="text-gray-300">
-                  Tidak ada video tersedia untuk film ini.
-                </p>
+                <p className="text-gray-300">Tidak ada video tersedia untuk film ini.</p>
               </div>
             )}
 
             {!videosLoading && movieVideos.length > 0 && (
               <div className="space-y-6">
                 {movieVideos.map((video) => (
-                  <div
-                    key={video.id}
-                    className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden"
-                  >
+                  <div key={video.id} className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
                     <div className="p-5 border-b border-white/20">
-                      <h4 className="font-semibold text-white text-lg">
-                        {video.name}
-                      </h4>
+                      <h4 className="font-semibold text-white text-lg">{video.name}</h4>
                       <p className="text-gray-300 text-sm mt-1">{video.type}</p>
                     </div>
                     <div className="relative aspect-video bg-black">
@@ -209,9 +202,7 @@ const MovieDetail = ({ movie, onClose }) => {
                 <div className="relative">
                   <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
                 </div>
-                <p className="mt-4 text-gray-300 font-medium">
-                  Memuat gambar...
-                </p>
+                <p className="mt-4 text-gray-300 font-medium">Memuat gambar...</p>
               </div>
             )}
 
@@ -225,9 +216,7 @@ const MovieDetail = ({ movie, onClose }) => {
             {!imagesLoading && !imagesError && movieImages.length === 0 && (
               <div className="bg-white/10 border border-white/20 rounded-xl p-8 text-center">
                 <div className="text-gray-400 text-4xl mb-2">🖼️</div>
-                <p className="text-gray-300">
-                  Tidak ada gambar tersedia untuk film ini.
-                </p>
+                <p className="text-gray-300">Tidak ada gambar tersedia untuk film ini.</p>
               </div>
             )}
 
@@ -235,10 +224,7 @@ const MovieDetail = ({ movie, onClose }) => {
               <div className="space-y-6">
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
                   <img
-                    src={getImageUrl(
-                      movieImages[selectedImageIndex].file_path,
-                      "w780"
-                    )}
+                    src={getImageUrl(movieImages[selectedImageIndex].file_path, "w780")}
                     alt={`${movie.title} - Image ${selectedImageIndex + 1}`}
                     className="w-full h-80 object-cover"
                   />
@@ -265,14 +251,84 @@ const MovieDetail = ({ movie, onClose }) => {
                         alt={`Thumbnail ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
-                      {image.type === "poster" && (
-                        <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded">
-                          P
-                        </div>
-                      )}
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+          </div>
+        );
+
+      // BARU: Tab Cast
+      case "cast":
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center mb-6">
+              <span className="w-1 h-6 bg-purple-500 mr-3 rounded-full"></span>
+              <h3 className="text-xl font-bold text-white">Pemeran Film</h3>
+            </div>
+
+            {creditsLoading && (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="relative">
+                  <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+                </div>
+                <p className="mt-4 text-gray-300 font-medium">Memuat data pemeran...</p>
+              </div>
+            )}
+
+            {creditsError && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
+                <div className="text-red-400 text-4xl mb-2">⚠️</div>
+                <p className="text-red-300 font-medium">{creditsError}</p>
+              </div>
+            )}
+
+            {!creditsLoading && !creditsError && (!movieCredits || movieCredits.length === 0) && (
+              <div className="bg-white/10 border border-white/20 rounded-xl p-8 text-center">
+                <div className="text-gray-400 text-4xl mb-2">👥</div>
+                <p className="text-gray-300">Tidak ada data pemeran untuk film ini.</p>
+              </div>
+            )}
+
+            {!creditsLoading && movieCredits && movieCredits.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {movieCredits.slice(0, 20).map((cast) => (
+                  <div
+                    key={cast.id}
+                    className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden hover:bg-white/20 transition-all hover:scale-105"
+                  >
+                    <div className="aspect-square bg-gray-800 relative overflow-hidden">
+                      <img
+                        src={getCastImageUrl(cast.profile_path, "w185")}
+                        alt={cast.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = "/api/placeholder/185/278";
+                        }}
+                      />
+                      {!cast.profile_path && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
+                          <span className="text-gray-400 text-4xl">👤</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h4 className="font-semibold text-white text-sm mb-1 truncate">
+                        {cast.name}
+                      </h4>
+                      <p className="text-gray-300 text-xs truncate">
+                        {cast.character}
+                      </p>
+                      <div className="flex items-center mt-2">
+                        <span className="text-yellow-400 text-xs">⭐</span>
+                        <span className="text-gray-300 text-xs ml-1">
+                          {cast.popularity ? Math.round(cast.popularity) : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -288,9 +344,7 @@ const MovieDetail = ({ movie, onClose }) => {
       {/* Background Image Full Screen */}
       <div className="absolute inset-0">
         <img
-          src={`https://image.tmdb.org/t/p/original${
-            movie.backdrop_path || movie.poster_path
-          }`}
+          src={`https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`}
           alt={movie.title}
           className="w-full h-full object-cover"
         />
@@ -298,7 +352,7 @@ const MovieDetail = ({ movie, onClose }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/80"></div>
       </div>
 
-      {/* Close Button - FIXED: z-index lebih tinggi */}
+      {/* Close Button */}
       <button
         onClick={handleClose}
         className="fixed top-6 right-6 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-white/20 hover:scale-110 z-[60]"
@@ -332,22 +386,19 @@ const MovieDetail = ({ movie, onClose }) => {
                 <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-full font-bold shadow-lg">
                   {movie.vote_average.toFixed(1)}
                 </span>
-                <span className="text-white/95">
-                  {formatDate(movie.release_date)}
-                </span>
-                <span className="text-white/95">
-                  {movie.original_language.toUpperCase()}
-                </span>
+                <span className="text-white/95">{formatDate(movie.release_date)}</span>
+                <span className="text-white/95">{movie.original_language.toUpperCase()}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation - DIPERBARUI: Menambah tab Cast */}
         <div className="flex-shrink-0 mx-8 mb-6">
           <div className="flex bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-1">
             {[
               { key: "info", label: "Informasi", icon: "📋" },
+              { key: "cast", label: "Pemeran", icon: "👥" }, // BARU: Tab Cast
               { key: "videos", label: "Video", icon: "🎬" },
               { key: "images", label: "Gambar", icon: "🖼️" },
             ].map((tab) => (
