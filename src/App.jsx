@@ -8,6 +8,17 @@ import GenreFilter from "./components/GenreFilter";
 import PeopleList from "./components/PeopleList";
 import TrendingSection from "./components/TrendingSection";
 
+// Constants for tab names
+const TABS = {
+  POPULAR: "popular",
+  SEARCH: "search",
+  TRENDING: "trending",
+  GENRES: "genres",
+  PEOPLE: "people",
+  TOP_RATED: "top-rated",
+  UPCOMING: "upcoming"
+};
+
 function App() {
   const { 
     movies, 
@@ -19,7 +30,7 @@ function App() {
   } = useMovies();
   
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [activeTab, setActiveTab] = useState("popular");
+  const [activeTab, setActiveTab] = useState(TABS.POPULAR);
   const [selectedGenre, setSelectedGenre] = useState(null);
 
   const handleMovieClick = (movie) => {
@@ -34,10 +45,11 @@ function App() {
     setActiveTab(tab);
     setSelectedMovie(null);
     
-    // Reset genre dan load data sesuai tab
-    if (tab !== "genres") {
+    // Reset genre and load data according to tab
+    if (tab !== TABS.GENRES) {
       setSelectedGenre(null);
-      if (tab !== "search" && tab !== "trending" && tab !== "people") {
+      const dataLoadingTabs = [TABS.SEARCH, TABS.TRENDING, TABS.PEOPLE];
+      if (!dataLoadingTabs.includes(tab)) {
         loadMoviesByType(tab);
       }
     }
@@ -45,89 +57,67 @@ function App() {
 
   const handleGenreSelect = async (genre) => {
     setSelectedGenre(genre);
-    setActiveTab("genres");
+    setActiveTab(TABS.GENRES);
     
-    // Panggil API untuk mendapatkan film berdasarkan genre
-    if (genre && genre.id) {
+    if (genre?.id) {
       await filterByGenre(genre.id);
     }
   };
 
+  // Component for movie list with common props
+  const MovieListComponent = ({ title }) => (
+    <MovieList
+      movies={movies}
+      loading={loading}
+      error={error}
+      onMovieClick={handleMovieClick}
+      title={title}
+    />
+  );
+
   const renderContent = () => {
-    switch (activeTab) {
-      case "popular":
-        return (
-          <MovieList
-            movies={movies}
-            loading={loading}
-            error={error}
-            onMovieClick={handleMovieClick}
-            title="Popular Movies"
+    const contentMap = {
+      [TABS.POPULAR]: () => (
+        <MovieListComponent title="Popular Movies" />
+      ),
+      
+      [TABS.SEARCH]: () => (
+        <div className="space-y-6">
+          <SearchBar onSearch={searchMovies} />
+          <MovieListComponent title="Search Results" />
+        </div>
+      ),
+      
+      [TABS.TRENDING]: () => (
+        <TrendingSection onMovieClick={handleMovieClick} />
+      ),
+      
+      [TABS.GENRES]: () => (
+        <div className="space-y-6">
+          <GenreFilter
+            selectedGenre={selectedGenre}
+            onGenreSelect={handleGenreSelect}
           />
-        );
-
-      case "search":
-        return (
-          <div className="space-y-6">
-            <SearchBar onSearch={searchMovies} />
-            <MovieList
-              movies={movies}
-              loading={loading}
-              error={error}
-              onMovieClick={handleMovieClick}
-              title="Search Results"
-            />
-          </div>
-        );
-
-      case "trending":
-        return <TrendingSection onMovieClick={handleMovieClick} />;
-
-      case "genres":
-        return (
-          <div className="space-y-6">
-            <GenreFilter
-              selectedGenre={selectedGenre}
-              onGenreSelect={handleGenreSelect}
-            />
-            <MovieList
-              movies={movies}
-              loading={loading}
-              error={error}
-              onMovieClick={handleMovieClick}
-              title={selectedGenre ? `${selectedGenre.name} Movies` : "Select a Genre"}
-            />
-          </div>
-        );
-
-      case "people":
-        return <PeopleList />;
-
-      case "top-rated":
-        return (
-          <MovieList
-            movies={movies}
-            loading={loading}
-            error={error}
-            onMovieClick={handleMovieClick}
-            title="Top Rated Movies"
+          <MovieListComponent 
+            title={selectedGenre ? `${selectedGenre.name} Movies` : "Select a Genre"} 
           />
-        );
+        </div>
+      ),
+      
+      [TABS.PEOPLE]: () => (
+        <PeopleList />
+      ),
+      
+      [TABS.TOP_RATED]: () => (
+        <MovieListComponent title="Top Rated Movies" />
+      ),
+      
+      [TABS.UPCOMING]: () => (
+        <MovieListComponent title="Upcoming Movies" />
+      )
+    };
 
-      case "upcoming":
-        return (
-          <MovieList
-            movies={movies}
-            loading={loading}
-            error={error}
-            onMovieClick={handleMovieClick}
-            title="Upcoming Movies"
-          />
-        );
-
-      default:
-        return null;
-    }
+    return contentMap[activeTab]?.() || null;
   };
 
   return (
@@ -144,12 +134,12 @@ function App() {
       {/* Navigation */}
       <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
 
-       {/* Main Content */}
+      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {renderContent()}
       </main>
 
-      {/* Movie Detail Modal dengan Video dan Images */}
+      {/* Movie Detail Modal */}
       {selectedMovie && (
         <MovieDetail 
           movie={selectedMovie} 

@@ -86,15 +86,6 @@ const TrendingSection = ({ onMovieClick }) => {
                 {item.title || item.name}
               </h3>
               <div className="flex items-center justify-between mt-2">
-                {/* <span className="text-yellow-400 text-sm">
-                  ⭐ {item.vote_average?.toFixed(1) || 'N/A'}
-                </span>
-                <span className="text-gray-400 text-sm">
-                  {item.release_date || item.first_air_date ? 
-                    new Date(item.release_date || item.first_air_date).getFullYear() : 
-                    'N/A'
-                  }
-                </span> */}
               </div>
               {item.media_type && (
                 <span className="inline-block bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded mt-2">
