@@ -96,7 +96,7 @@ const HeroSection = ({ movies, onMovieClick }) => {
 
   const backdropUrl = featuredMovie.backdrop_path
     ? `https://image.tmdb.org/t/p/w1280${featuredMovie.backdrop_path}`
-    : 'https://via.placeholder.com/1280x720/374151/ffffff?text=No+Image';
+    : '/no-image.svg';
 
   return (
     <div className="relative h-96 mb-8 rounded-xl overflow-hidden">
