@@ -18,11 +18,22 @@ export const movieAPI = {
     return response.json();
   },
 
-  // Detail film
+  // Detail film (enhanced with credits and videos)
   getMovieDetail: async (id) => {
     const response = await fetch(
-      `${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`
+      `${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US&append_to_response=credits,videos`
     );
+    return response.json();
+  },
+
+  // Discover film berdasarkan filter (replace or complement getPopularMovies)
+  discoverMovies: async (params = {}) => {
+    const query = new URLSearchParams({
+      api_key: API_KEY,
+      language: "en-US",
+      ...params, // Allow custom filters like sort_by, with_genres, etc.
+    }).toString();
+    const response = await fetch(`${BASE_URL}/discover/movie?${query}`);
     return response.json();
   },
 
@@ -114,14 +125,15 @@ export const movieAPI = {
     return response.json();
   },
 
-  getPersonMovieCredits: async (personId) => { // add cast 
+  getPersonMovieCredits: async (personId) => {
+    // add cast
     const response = await fetch(
       `${BASE_URL}/person/${personId}/movie_credits?api_key=${API_KEY}&language=en-US`
     );
     return response.json();
   },
 
-   getMovieCredits: async (movieId) => {
+  getMovieCredits: async (movieId) => {
     const response = await fetch(
       `${BASE_URL}/movie/${movieId}/credits?api_key=${API_KEY}&language=en-US`
     );

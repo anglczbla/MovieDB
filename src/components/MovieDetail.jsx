@@ -20,6 +20,7 @@ const MovieDetail = ({ movie, onClose }) => {
 
   const [activeTab, setActiveTab] = useState("info");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [movieDetail, setMovieDetail] = useState(null);
 
   // Load video, gambar, dan cast ketika modal dibuka
   useEffect(() => {
@@ -27,7 +28,10 @@ const MovieDetail = ({ movie, onClose }) => {
       loadMovieVideos(movie.id);
       loadMovieImages(movie.id);
       loadMovieCredits(movie.id);
+      
     }
+
+    
 
     // Cleanup saat modal ditutup
     return () => {
@@ -60,6 +64,22 @@ const MovieDetail = ({ movie, onClose }) => {
   const getCastImageUrl = (profilePath, size = "w185") => {
     if (!profilePath) return "/api/placeholder/185/278";
     return `https://image.tmdb.org/t/p/${size}${profilePath}`;
+  };
+
+   const formatCurrency = (amount) => {
+    if (!amount) return 'N/A';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      notation: 'compact'
+    }).format(amount);
+  };
+
+   const formatRuntime = (minutes) => {
+    if (!minutes) return 'N/A';
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}h ${mins}m`;
   };
 
 
@@ -115,6 +135,41 @@ const MovieDetail = ({ movie, onClose }) => {
                   </div>
                 </div>
               </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20 hover:bg-white/20 transition-all">
+                <div className="flex items-center mb-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-500/20 rounded-full flex items-center justify-center mr-2 sm:mr-3">
+                    <span className="text-emerald-400 font-bold text-sm sm:text-base">💎</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white text-sm sm:text-base">Revenue</h4>
+                    <p className="text-gray-300 text-xs sm:text-sm">{formatCurrency(movieDetail.revenue)}</p>
+                  </div>
+                </div>
+              </div>
+
+               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20 hover:bg-white/20 transition-all">
+                <div className="flex items-center mb-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-500/20 rounded-full flex items-center justify-center mr-2 sm:mr-3">
+                    <span className="text-purple-400 font-bold text-sm sm:text-base">⏱️</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white text-sm sm:text-base">Durasi</h4>
+                    <p className="text-gray-300 text-xs sm:text-sm">{formatRuntime(movieDetail.runtime)}</p>
+                  </div>
+                </div>
+              </div>
+
+               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20 hover:bg-white/20 transition-all">
+                <div className="flex items-center mb-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-500/20 rounded-full flex items-center justify-center mr-2 sm:mr-3">
+                    <span className="text-red-400 font-bold text-sm sm:text-base">💰</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white text-sm sm:text-base">Budget</h4>
+                    <p className="text-gray-300 text-xs sm:text-sm">{formatCurrency(movieDetail.budget)}</p>
+                  </div>
+                </div>
+              </div>
 
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20 hover:bg-white/20 transition-all">
                 <div className="flex items-center mb-2">
@@ -127,6 +182,49 @@ const MovieDetail = ({ movie, onClose }) => {
                   </div>
                 </div>
               </div>
+
+              {/* Genres */}
+            {movieDetail.genres && movieDetail.genres.length > 0 && (
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-white/20">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                  <span className="w-1 h-6 bg-purple-500 mr-3 rounded-full"></span>
+                  Genre
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {movieDetail.genres.map((genre) => (
+                    <span
+                      key={genre.id}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium"
+                    >
+                      {genre.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+               {movieDetail.production_companies && movieDetail.production_companies.length > 0 && (
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-white/20">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                  <span className="w-1 h-6 bg-orange-500 mr-3 rounded-full"></span>
+                  Production Companies
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {movieDetail.production_companies.map((company) => (
+                    <div key={company.id} className="flex items-center space-x-3 bg-white/5 rounded-lg p-3">
+                      {company.logo_path && (
+                        <img
+                          src={getImageUrl(company.logo_path, "w92")}
+                          alt={company.name}
+                          className="w-8 h-8 object-contain bg-white rounded"
+                        />
+                      )}
+                      <span className="text-gray-300 text-sm">{company.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             </div>
           </div>
         );

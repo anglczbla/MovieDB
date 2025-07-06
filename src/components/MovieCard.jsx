@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 const MovieCard = ({ movie, onClick }) => {
   const imageUrl = movie.poster_path
     ? `${import.meta.env.VITE_APP_TMDB_IMG_BASE_URL}${movie.poster_path}`
-    : 'https://via.placeholder.com/300x450?text=No+Image';
+    : "https://via.placeholder.com/300x450?text=No+Image";
 
   return (
     <div
@@ -16,7 +16,7 @@ const MovieCard = ({ movie, onClick }) => {
         className="w-full h-auto object-contain"
         onError={(e) => {
           // Fallback jika gambar gagal dimuat
-          e.target.src = 'https://via.placeholder.com/300x450?text=No+Image';
+          e.target.src = "https://via.placeholder.com/300x450?text=No+Image";
         }}
       />
       <div className="p-4">
@@ -25,12 +25,12 @@ const MovieCard = ({ movie, onClick }) => {
         </h3>
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">
-            {movie.release_date?.split('-')[0] || 'N/A'}
+            {movie.release_date?.split("-")[0] || "N/A"}
           </span>
           <div className="flex items-center">
             <span className="text-yellow-500 mr-1">⭐</span>
             <span className="text-sm text-gray-700">
-              {movie.vote_average?.toFixed(1) || 'N/A'}
+              {movie.vote_average?.toFixed(1) || "N/A"}
             </span>
           </div>
         </div>
