@@ -8,7 +8,7 @@ const MovieCard = ({ movie, onClick }) => {
   return (
     <div
       onClick={() => onClick(movie)}
-      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-transform hover:scale-105 hover:shadow-xl"
+      className="bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-700 transition-colors cursor-pointer"
     >
       <img
         src={imageUrl}
@@ -20,16 +20,14 @@ const MovieCard = ({ movie, onClick }) => {
         }}
       />
       <div className="p-4">
-        <h3 className="font-bold text-lg mb-2 text-gray-800 line-clamp-2">
-          {movie.title}
-        </h3>
+        <h3 className="font-semibold text-white truncate">{movie.title}</h3>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-gray-200">
             {movie.release_date?.split("-")[0] || "N/A"}
           </span>
           <div className="flex items-center">
-            <span className="text-yellow-500 mr-1">⭐</span>
-            <span className="text-sm text-gray-700">
+            <span className="text-yellow-400 mr-1">⭐</span>
+            <span className="text-sm text-gray-100">
               {movie.vote_average?.toFixed(1) || "N/A"}
             </span>
           </div>

@@ -1,143 +1,141 @@
-import { useState, useEffect } from 'react';
-import { movieAPI } from '../services/api';
+import { useState, useEffect, useCallback } from "react";
+import { movieAPI } from "../services/api";
 
 export const useMovies = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [genres, setGenres] = useState([]);
-  const [currentDataType, setCurrentDataType] = useState('popular');
-  
-  // State baru untuk video dan gambar
+  const [currentDataType, setCurrentDataType] = useState("popular");
+
+  // State untuk video, gambar, credits, dan detail
   const [movieVideos, setMovieVideos] = useState([]);
   const [movieImages, setMovieImages] = useState([]);
+  const [movieCredits, setMovieCredits] = useState([]);
+  const [movieDetail, setMovieDetail] = useState(null);
+
+  // Loading states
   const [videosLoading, setVideosLoading] = useState(false);
   const [imagesLoading, setImagesLoading] = useState(false);
+  const [creditsLoading, setCreditsLoading] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  // Error states
   const [videosError, setVideosError] = useState(null);
   const [imagesError, setImagesError] = useState(null);
-
-  const [movieCredits, setMovieCredits] = useState([]);
-  const [creditsLoading, setCreditsLoading] = useState(false);
   const [creditsError, setCreditsError] = useState(null);
+  const [detailError, setDetailError] = useState(null);
 
-  useEffect(() => {
-    loadPopularMovies();
-    loadGenres();
-  }, []);
-
-  const loadPopularMovies = async () => {
+  // Fungsi untuk memuat data, dibungkus dengan useCallback
+  const loadPopularMovies = useCallback(async () => {
     try {
       setLoading(true);
       const data = await movieAPI.getPopularMovies();
       setMovies(data.results);
-      setCurrentDataType('popular');
+      setCurrentDataType("popular");
       setError(null);
     } catch (err) {
       setError(`Gagal memuat film populer: ${err.message}`);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadTopRatedMovies = async () => {
+  const loadTopRatedMovies = useCallback(async () => {
     try {
       setLoading(true);
       const data = await movieAPI.getTopRatedMovies();
       setMovies(data.results);
-      setCurrentDataType('top-rated');
+      setCurrentDataType("top-rated");
       setError(null);
     } catch (err) {
       setError(`Gagal memuat film top rated: ${err.message}`);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadUpcomingMovies = async () => {
+  const loadUpcomingMovies = useCallback(async () => {
     try {
       setLoading(true);
       const data = await movieAPI.getUpcomingMovies();
       setMovies(data.results);
-      setCurrentDataType('upcoming');
+      setCurrentDataType("upcoming");
       setError(null);
     } catch (err) {
       setError(`Gagal memuat film upcoming: ${err.message}`);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadGenres = async () => {
+  const loadGenres = useCallback(async () => {
     try {
       const data = await movieAPI.getGenres();
       setGenres(data.genres);
     } catch (err) {
-      console.error('Gagal memuat genre:', err.message);
+      console.error("Gagal memuat genre:", err.message);
     }
-  };
+  }, []);
 
-  const filterByGenre = async (genreId) => {
+  const filterByGenre = useCallback(async (genreId) => {
     try {
       setLoading(true);
       setError(null);
-      
       const data = await movieAPI.discoverByGenre(genreId);
       setMovies(data.results);
-      setCurrentDataType('genre');
+      setCurrentDataType("genre");
     } catch (err) {
       setError(`Gagal memfilter film: ${err.message}`);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const searchMovies = async (query) => {
+  const searchMovies = useCallback(async (query) => {
     try {
       setLoading(true);
       setError(null);
-      
-      if (query.trim() === '') {
+      if (query.trim() === "") {
         loadPopularMovies();
         return;
       }
-      
       const data = await movieAPI.searchMovies(query);
       setMovies(data.results);
-      setCurrentDataType('search');
+      setCurrentDataType("search");
     } catch (err) {
       setError(`Gagal mencari film: ${err.message}`);
     } finally {
       setLoading(false);
     }
-  };
+  }, [loadPopularMovies]);
 
-  const loadMoviesByType = async (type) => {
-    switch (type) {
-      case 'popular':
-        return loadPopularMovies();
-      case 'top-rated':
-        return loadTopRatedMovies();
-      case 'upcoming':
-        return loadUpcomingMovies();
-      default:
-        return loadPopularMovies();
-    }
-  };
+  const loadMoviesByType = useCallback(
+    async (type) => {
+      switch (type) {
+        case "popular":
+          return loadPopularMovies();
+        case "top-rated":
+          return loadTopRatedMovies();
+        case "upcoming":
+          return loadUpcomingMovies();
+        default:
+          return loadPopularMovies();
+      }
+    },
+    [loadPopularMovies, loadTopRatedMovies, loadUpcomingMovies]
+  );
 
-  // 🎬 FUNGSI BARU: Load video film
-  const loadMovieVideos = async (movieId) => {
+  const loadMovieVideos = useCallback(async (movieId) => {
     try {
       setVideosLoading(true);
       setVideosError(null);
-      
       const data = await movieAPI.getMovieVideos(movieId);
-      
-      // Filter untuk ambil trailer YouTube saja
       const youtubeTrailers = data.results.filter(
-        video => video.site === 'YouTube' && 
-                 (video.type === 'Trailer' || video.type === 'Teaser')
+        (video) =>
+          video.site === "YouTube" &&
+          (video.type === "Trailer" || video.type === "Teaser")
       );
-      
       setMovieVideos(youtubeTrailers);
     } catch (err) {
       setVideosError(`Gagal memuat video: ${err.message}`);
@@ -145,94 +143,115 @@ export const useMovies = () => {
     } finally {
       setVideosLoading(false);
     }
-  };
+  }, []);
 
-  // 🖼️ FUNGSI BARU: Load gambar film
-  const loadMovieImages = async (movieId) => {
+  const loadMovieImages = useCallback(async (movieId) => {
     try {
       setImagesLoading(true);
       setImagesError(null);
-      
       const data = await movieAPI.getMovieImages(movieId);
-      
-      // Gabungkan backdrop dan poster
       const allImages = [
-        ...data.backdrops.map(img => ({ ...img, type: 'backdrop' })),
-        ...data.posters.map(img => ({ ...img, type: 'poster' }))
+        ...data.backdrops.map((img) => ({ ...img, type: "backdrop" })),
+        ...data.posters.map((img) => ({ ...img, type: "poster" })),
       ];
-      
-      // Sort berdasarkan vote average (gambar terbaik dulu)
-      const sortedImages = allImages.sort((a, b) => b.vote_average - a.vote_average);
-      
-      setMovieImages(sortedImages.slice(0, 20)); // Ambil 20 gambar terbaik
+      const sortedImages = allImages.sort(
+        (a, b) => b.vote_average - a.vote_average
+      );
+      setMovieImages(sortedImages.slice(0, 20));
     } catch (err) {
       setImagesError(`Gagal memuat gambar: ${err.message}`);
       setMovieImages([]);
     } finally {
       setImagesLoading(false);
     }
-  };
+  }, []);
 
-  const loadMovieCredits = async (movieId) => {
-    setCreditsLoading(true);
-    setCreditsError(null);
+  const loadMovieCredits = useCallback(async (movieId) => {
     try {
+      setCreditsLoading(true);
+      setCreditsError(null);
       const data = await movieAPI.getMovieCredits(movieId);
       setMovieCredits(data.cast || []);
     } catch (err) {
-      setCreditsError(err.message);
+      setCreditsError(`Gagal memuat credits: ${err.message}`);
+      setMovieCredits([]);
     } finally {
       setCreditsLoading(false);
     }
-  };
+  }, []);
 
-  // Fungsi untuk mengambil kredit film berdasarkan personId
-  const getPersonMovieCredits = async (personId) => {
-    setLoading(true);
-    setError(null);
+  const loadMovieDetails = useCallback(async (movieId) => {
     try {
-      const data = await movieAPI.getPersonMovieCredits(personId);
-      setMovies(data.cast || []); // Hanya ambil bagian 'cast' untuk daftar film yang diperankan
+      setDetailLoading(true);
+      setDetailError(null);
+      console.log("Loading movie details for ID:", movieId); // Debug log
+      const data = await movieAPI.getMovieDetails(movieId);
+      console.log("Movie details loaded:", data); // Debug log
+      setMovieDetail(data);
+      return data;
     } catch (err) {
-      setError(err.message);
+      console.error("Error loading movie details:", err); // Debug log
+      console.error("Error details:", {
+        message: err.message,
+        status: err.status,
+        response: err.response,
+      });
+      setDetailError(`Gagal memuat detail film: ${err.message}`);
+      setMovieDetail(null);
+      throw err;
+    } finally {
+      setDetailLoading(false);
+    }
+  }, []);
+
+  const getPersonMovieCredits = useCallback(async (personId) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await movieAPI.getPersonMovieCredits(personId);
+      setMovies(data.cast || []);
+    } catch (err) {
+      setError(`Gagal memuat film person: ${err.message}`);
+      setMovies([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // 🧹 FUNGSI BARU: Reset video dan gambar
-  const resetMovieMedia = () => {
+  const resetMovieMedia = useCallback(() => {
     setMovieVideos([]);
     setMovieImages([]);
     setMovieCredits([]);
+    setMovieDetail(null);
     setVideosError(null);
     setImagesError(null);
     setCreditsError(null);
-  };
+    setDetailError(null);
+  }, []);
 
-  
+  useEffect(() => {
+    loadPopularMovies();
+    loadGenres();
+  }, [loadPopularMovies, loadGenres]);
+
   return {
-    // State utama
     movies,
     loading,
     error,
     genres,
     currentDataType,
-    
-    // State video dan gambar
     movieVideos,
     movieImages,
     movieCredits,
-
+    movieDetail,
     videosLoading,
     imagesLoading,
     creditsLoading,
-    
+    detailLoading,
     videosError,
     imagesError,
     creditsError,
-    
-    // Fungsi utama
+    detailError,
     searchMovies,
     loadPopularMovies,
     loadTopRatedMovies,
@@ -240,11 +259,10 @@ export const useMovies = () => {
     filterByGenre,
     loadMoviesByType,
     getPersonMovieCredits,
-    
-    // Fungsi baru
     loadMovieVideos,
     loadMovieImages,
-    resetMovieMedia,
     loadMovieCredits,
+    loadMovieDetails,
+    resetMovieMedia,
   };
 };

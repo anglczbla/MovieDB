@@ -19,7 +19,7 @@ export const movieAPI = {
   },
 
   // Detail film (enhanced with credits and videos)
-  getMovieDetail: async (id) => {
+  getMovieDetails: async (id) => {
     const response = await fetch(
       `${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US&append_to_response=credits,videos`
     );
