@@ -3,7 +3,7 @@ import React from "react";
 const MovieCard = ({ movie, onClick }) => {
   const imageUrl = movie.poster_path
     ? `${import.meta.env.VITE_APP_TMDB_IMG_BASE_URL}${movie.poster_path}`
-    : "/no-image.svg";
+    : "https://via.placeholder.com/300x450?text=No+Image";
 
   return (
     <div
@@ -16,7 +16,7 @@ const MovieCard = ({ movie, onClick }) => {
         className="w-full h-auto object-contain"
         onError={(e) => {
           // Fallback jika gambar gagal dimuat
-          e.target.src = "/no-image.svg";
+          e.target.src = "https://via.placeholder.com/300x450?text=No+Image";
         }}
       />
       <div className="p-4">
