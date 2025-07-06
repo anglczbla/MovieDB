@@ -1,37 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { movieAPI } from '../services/api';
+import { useState, useEffect } from 'react';
+import { useMovies } from "../hooks/useMovie";
 
 const TrendingSection = ({ onMovieClick }) => {
-  const [trendingMovies, setTrendingMovies] = useState([]);
-  const [trendingPeople, setTrendingPeople] = useState([]);
-  const [trendingAll, setTrendingAll] = useState([]);
+  const {
+    trendingMovies,
+    trendingPeople,
+    trendingAll,
+    trendingLoading,
+    trendingError,
+    loadTrending,
+  } = useMovies();
+
   const [activeSection, setActiveSection] = useState('movies');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
+  // Memuat data trending saat komponen mount
   useEffect(() => {
-    const fetchTrending = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [moviesResponse, peopleResponse, allResponse] = await Promise.all([
-          movieAPI.getTrendingMoviesDay(),
-          movieAPI.getTrendingPeopleDay(),
-          movieAPI.getTrendingAllDay(),
-        ]);
-
-        setTrendingMovies(moviesResponse.results || []);
-        setTrendingPeople(peopleResponse.results || []);
-        setTrendingAll(allResponse.results || []);
-      } catch (err) {
-        setError('Failed to load trending content', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTrending();
-  }, []);
+    loadTrending();
+  }, [loadTrending]);
 
   const sections = [
     { id: 'movies', label: 'Movies', icon: '🎬' },
@@ -85,8 +69,19 @@ const TrendingSection = ({ onMovieClick }) => {
               <h3 className="font-semibold text-white truncate">
                 {item.title || item.name}
               </h3>
-              <div className="flex items-center justify-between mt-2">
-              </div>
+              {item.title && ( // Hanya tampilkan untuk film
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-sm text-gray-200">
+                    {item.release_date?.split('-')[0] || 'N/A'}
+                  </span>
+                  <div className="flex items-center">
+                    <span className="text-yellow-400 mr-1">⭐</span>
+                    <span className="text-sm text-gray-100">
+                      {item.vote_average?.toFixed(1) || 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              )}
               {item.media_type && (
                 <span className="inline-block bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded mt-2">
                   {item.media_type}
@@ -99,7 +94,7 @@ const TrendingSection = ({ onMovieClick }) => {
     );
   };
 
-  if (loading) {
+  if (trendingLoading) {
     return (
       <div className="flex justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div>
@@ -107,10 +102,10 @@ const TrendingSection = ({ onMovieClick }) => {
     );
   }
 
-  if (error) {
+  if (trendingError) {
     return (
       <div className="text-center py-8">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500">{trendingError}</p>
       </div>
     );
   }

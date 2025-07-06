@@ -8,25 +8,57 @@ export const useMovies = () => {
   const [genres, setGenres] = useState([]);
   const [currentDataType, setCurrentDataType] = useState("popular");
 
-  // State untuk video, gambar, credits, dan detail
+  // State untuk video, gambar, credits, trending dan detail
   const [movieVideos, setMovieVideos] = useState([]);
   const [movieImages, setMovieImages] = useState([]);
   const [movieCredits, setMovieCredits] = useState([]);
   const [movieDetail, setMovieDetail] = useState(null);
+  const [trendingMovies, setTrendingMovies] = useState([]);
+  const [trendingPeople, setTrendingPeople] = useState([]);
+  const [trendingAll, setTrendingAll] = useState([]);
 
   // Loading states
+  const [trendingLoading, setTrendingLoading] = useState(false);
   const [videosLoading, setVideosLoading] = useState(false);
   const [imagesLoading, setImagesLoading] = useState(false);
   const [creditsLoading, setCreditsLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
 
   // Error states
+  const [trendingError, setTrendingError] = useState(null);
   const [videosError, setVideosError] = useState(null);
   const [imagesError, setImagesError] = useState(null);
   const [creditsError, setCreditsError] = useState(null);
   const [detailError, setDetailError] = useState(null);
 
   // Fungsi untuk memuat data, dibungkus dengan useCallback
+  // Fungsi untuk memuat data trending
+  const loadTrending = useCallback(async () => {
+    try {
+      setTrendingLoading(true);
+      setTrendingError(null);
+      console.log("Fetching trending data..."); // Debugging
+      const [moviesResponse, peopleResponse, allResponse] = await Promise.all([
+        movieAPI.getTrendingMoviesDay(),
+        movieAPI.getTrendingPeopleDay(),
+        movieAPI.getTrendingAllDay(),
+      ]);
+      console.log("Trending data loaded:", {
+        movies: moviesResponse.results,
+        people: peopleResponse.results,
+        all: allResponse.results,
+      }); // Debugging
+      setTrendingMovies(moviesResponse.results || []);
+      setTrendingPeople(peopleResponse.results || []);
+      setTrendingAll(allResponse.results || []);
+    } catch (err) {
+      console.error("Error fetching trending data:", err); // Debugging
+      setTrendingError(`Gagal memuat trending content: ${err.message}`);
+    } finally {
+      setTrendingLoading(false);
+    }
+  }, []);
+
   const loadPopularMovies = useCallback(async () => {
     try {
       setLoading(true);
@@ -92,23 +124,26 @@ export const useMovies = () => {
     }
   }, []);
 
-  const searchMovies = useCallback(async (query) => {
-    try {
-      setLoading(true);
-      setError(null);
-      if (query.trim() === "") {
-        loadPopularMovies();
-        return;
+  const searchMovies = useCallback(
+    async (query) => {
+      try {
+        setLoading(true);
+        setError(null);
+        if (query.trim() === "") {
+          loadPopularMovies();
+          return;
+        }
+        const data = await movieAPI.searchMovies(query);
+        setMovies(data.results);
+        setCurrentDataType("search");
+      } catch (err) {
+        setError(`Gagal mencari film: ${err.message}`);
+      } finally {
+        setLoading(false);
       }
-      const data = await movieAPI.searchMovies(query);
-      setMovies(data.results);
-      setCurrentDataType("search");
-    } catch (err) {
-      setError(`Gagal mencari film: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  }, [loadPopularMovies]);
+    },
+    [loadPopularMovies]
+  );
 
   const loadMoviesByType = useCallback(
     async (type) => {
@@ -232,7 +267,8 @@ export const useMovies = () => {
   useEffect(() => {
     loadPopularMovies();
     loadGenres();
-  }, [loadPopularMovies, loadGenres]);
+    loadTrending;
+  }, [loadPopularMovies, loadGenres, loadTrending]);
 
   return {
     movies,
@@ -244,10 +280,15 @@ export const useMovies = () => {
     movieImages,
     movieCredits,
     movieDetail,
+    trendingMovies,
+    trendingPeople,
+    trendingAll,
+    trendingLoading,
     videosLoading,
     imagesLoading,
     creditsLoading,
     detailLoading,
+    trendingError,
     videosError,
     imagesError,
     creditsError,
@@ -263,6 +304,7 @@ export const useMovies = () => {
     loadMovieImages,
     loadMovieCredits,
     loadMovieDetails,
+    loadTrending,
     resetMovieMedia,
   };
 };
