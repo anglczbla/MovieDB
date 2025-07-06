@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMovies } from "./hooks/useMovie";
 import SearchBar from "./components/SearchBar";
 import MovieList from "./components/MovieList";
@@ -7,6 +7,7 @@ import Navigation from "./components/Navigation";
 import GenreFilter from "./components/GenreFilter";
 import PeopleList from "./components/PeopleList";
 import TrendingSection from "./components/TrendingSection";
+import { movieAPI } from "./services/api";
 
 // Constants for tab names
 const TABS = {
@@ -34,6 +35,46 @@ function App() {
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // State terpisah untuk setiap jenis film
+  const [topRatedMovies, setTopRatedMovies] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [topRatedLoading, setTopRatedLoading] = useState(true);
+  const [upcomingLoading, setUpcomingLoading] = useState(true);
+  const [topRatedError, setTopRatedError] = useState(null);
+  const [upcomingError, setUpcomingError] = useState(null);
+
+  // Load data untuk trending page saat komponen pertama kali dimuat
+  useEffect(() => {
+    loadTopRatedMovies();
+    loadUpcomingMovies();
+  }, []);
+
+  const loadTopRatedMovies = async () => {
+    try {
+      setTopRatedLoading(true);
+      setTopRatedError(null);
+      const data = await movieAPI.getTopRatedMovies();
+      setTopRatedMovies(data.results);
+    } catch (err) {
+      setTopRatedError(`Gagal memuat film top rated: ${err.message}`);
+    } finally {
+      setTopRatedLoading(false);
+    }
+  };
+
+  const loadUpcomingMovies = async () => {
+    try {
+      setUpcomingLoading(true);
+      setUpcomingError(null);
+      const data = await movieAPI.getUpcomingMovies();
+      setUpcomingMovies(data.results);
+    } catch (err) {
+      setUpcomingError(`Gagal memuat film upcoming: ${err.message}`);
+    } finally {
+      setUpcomingLoading(false);
+    }
+  };
 
   const handleMovieClick = (movie) => {
     setSelectedMovie(movie);
@@ -78,12 +119,12 @@ function App() {
     }
   };
 
-  // Component for movie list with common props
-  const MovieListComponent = ({ title }) => (
+  // Component untuk movie list dengan props yang bisa dikustomisasi
+  const MovieListComponent = ({ title, movies: movieList, loading: isLoading, error: movieError }) => (
     <MovieList
-      movies={movies}
-      loading={loading}
-      error={error}
+      movies={movieList || movies}
+      loading={isLoading !== undefined ? isLoading : loading}
+      error={movieError !== undefined ? movieError : error}
       onMovieClick={handleMovieClick}
       title={title}
     />
@@ -92,9 +133,26 @@ function App() {
   const renderContent = () => {
     const contentMap = {
       [TABS.TRENDING]: () => (
-        <>
-          <MovieListComponent title="Trending Movies" />
+        <div className="space-y-6">
           <SearchBar onSearch={handleHomeSearch} />
+          <TrendingSection onMovieClick={handleMovieClick} />
+          
+          {/* Top Rated Movies dengan state terpisah */}
+          <MovieListComponent 
+            title="Top Rated Movies" 
+            movies={topRatedMovies}
+            loading={topRatedLoading}
+            error={topRatedError}
+          />
+          
+          {/* Upcoming Movies dengan state terpisah */}
+          <MovieListComponent 
+            title="Upcoming Movies" 
+            movies={upcomingMovies}
+            loading={upcomingLoading}
+            error={upcomingError}
+          />
+          
           {/* Search Results */}
           {isSearching && (
             <div className="text-center py-8">
@@ -115,9 +173,9 @@ function App() {
               />
             </div>
           )}
-        </>
+        </div>
       ),
-
+      
       [TABS.SEARCH]: () => (
         <div className="space-y-6">
           <SearchBar onSearch={searchMovies} />
@@ -141,11 +199,25 @@ function App() {
         </div>
       ),
 
+      [TABS.TOP_RATED]: () => (
+        <MovieListComponent 
+          title="Top Rated Movies" 
+          movies={topRatedMovies}
+          loading={topRatedLoading}
+          error={topRatedError}
+        />
+      ),
+
+      [TABS.UPCOMING]: () => (
+        <MovieListComponent 
+          title="Upcoming Movies" 
+          movies={upcomingMovies}
+          loading={upcomingLoading}
+          error={upcomingError}
+        />
+      ),
+
       [TABS.PEOPLE]: () => <PeopleList />,
-
-      [TABS.TOP_RATED]: () => <MovieListComponent title="Top Rated Movies" />,
-
-      [TABS.UPCOMING]: () => <MovieListComponent title="Upcoming Movies" />,
     };
 
     return contentMap[activeTab]?.() || null;

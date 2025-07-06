@@ -43,7 +43,7 @@ const SearchBar = ({ onSearch }) => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Search for a movie, tv show, person......"
+              placeholder="Search for a movie"
               className="flex-1 px-6 py-4 text-gray-700 focus:outline-none text-lg"
             />
             <button

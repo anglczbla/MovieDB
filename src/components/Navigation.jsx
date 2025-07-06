@@ -3,7 +3,6 @@ import React from 'react';
 const Navigation = ({ activeTab, onTabChange }) => {
   const tabs = [
     { id: 'trending', label: 'Trending', icon: '📈' },
-    { id: 'search', label: 'Search', icon: '🔍' },
     { id: 'popular', label: 'Popular', icon: '🔥' },
     { id: 'upcoming', label: 'Upcoming', icon: '🚀' },
     { id: 'genres', label: 'Genres', icon: '🎭' },
