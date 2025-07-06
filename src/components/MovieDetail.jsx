@@ -62,6 +62,8 @@ const MovieDetail = ({ movie, onClose }) => {
     return `https://image.tmdb.org/t/p/${size}${profilePath}`;
   };
 
+
+  //  FUNGSI ATUR TAB
   const renderTabContent = () => {
     switch (activeTab) {
       case "info":
@@ -334,6 +336,7 @@ const MovieDetail = ({ movie, onClose }) => {
     }
   };
 
+  // INI ADALAH RETURN UTAMA
   return (
     <div className="fixed inset-0 bg-black z-50 overflow-hidden h-screen">
       {/* Background Image Full Screen */}

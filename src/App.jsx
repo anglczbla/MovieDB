@@ -16,22 +16,24 @@ const TABS = {
   GENRES: "genres",
   PEOPLE: "people",
   TOP_RATED: "top-rated",
-  UPCOMING: "upcoming"
+  UPCOMING: "upcoming",
 };
 
 function App() {
-  const { 
-    movies, 
-    loading, 
-    error, 
-    searchMovies, 
-    loadMoviesByType, 
+  const {
+    movies,
+    loading,
+    error,
+    searchMovies,
+    loadMoviesByType,
     filterByGenre,
   } = useMovies();
-  
+
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [activeTab, setActiveTab] = useState(TABS.POPULAR);
+  const [activeTab, setActiveTab] = useState(TABS.TRENDING);
   const [selectedGenre, setSelectedGenre] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleMovieClick = (movie) => {
     setSelectedMovie(movie);
@@ -44,7 +46,7 @@ function App() {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setSelectedMovie(null);
-    
+
     // Reset genre and load data according to tab
     if (tab !== TABS.GENRES) {
       setSelectedGenre(null);
@@ -58,9 +60,21 @@ function App() {
   const handleGenreSelect = async (genre) => {
     setSelectedGenre(genre);
     setActiveTab(TABS.GENRES);
-    
+
     if (genre?.id) {
       await filterByGenre(genre.id);
+    }
+  };
+
+  const handleHomeSearch = async (query) => {
+    if (query.trim()) {
+      setIsSearching(true);
+      await searchMovies(query);
+      setSearchResults(movies);
+      setIsSearching(false);
+    } else {
+      setSearchResults([]);
+      setIsSearching(false);
     }
   };
 
@@ -77,44 +91,61 @@ function App() {
 
   const renderContent = () => {
     const contentMap = {
-      [TABS.POPULAR]: () => (
-        <MovieListComponent title="Popular Movies" />
+      [TABS.TRENDING]: () => (
+        <>
+          <MovieListComponent title="Trending Movies" />
+          <SearchBar onSearch={handleHomeSearch} />
+          {/* Search Results */}
+          {isSearching && (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+            </div>
+          )}
+          {searchResults.length > 0 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Search Results
+              </h2>
+              <MovieList
+                movies={searchResults}
+                loading={false}
+                error={null}
+                onMovieClick={handleMovieClick}
+                title=""
+              />
+            </div>
+          )}
+        </>
       ),
-      
+
       [TABS.SEARCH]: () => (
         <div className="space-y-6">
           <SearchBar onSearch={searchMovies} />
           <MovieListComponent title="Search Results" />
         </div>
       ),
-      
-      [TABS.TRENDING]: () => (
-        <TrendingSection onMovieClick={handleMovieClick} />
-      ),
-      
+
+      [TABS.POPULAR]: () => <MovieListComponent title="Popular Movies" />,
+
       [TABS.GENRES]: () => (
         <div className="space-y-6">
           <GenreFilter
             selectedGenre={selectedGenre}
             onGenreSelect={handleGenreSelect}
           />
-          <MovieListComponent 
-            title={selectedGenre ? `${selectedGenre.name} Movies` : "Select a Genre"} 
+          <MovieListComponent
+            title={
+              selectedGenre ? `${selectedGenre.name} Movies` : "Select a Genre"
+            }
           />
         </div>
       ),
-      
-      [TABS.PEOPLE]: () => (
-        <PeopleList />
-      ),
-      
-      [TABS.TOP_RATED]: () => (
-        <MovieListComponent title="Top Rated Movies" />
-      ),
-      
-      [TABS.UPCOMING]: () => (
-        <MovieListComponent title="Upcoming Movies" />
-      )
+
+      [TABS.PEOPLE]: () => <PeopleList />,
+
+      [TABS.TOP_RATED]: () => <MovieListComponent title="Top Rated Movies" />,
+
+      [TABS.UPCOMING]: () => <MovieListComponent title="Upcoming Movies" />,
     };
 
     return contentMap[activeTab]?.() || null;
@@ -135,16 +166,11 @@ function App() {
       <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {renderContent()}
-      </main>
+      <main className="container mx-auto px-4 py-8">{renderContent()}</main>
 
       {/* Movie Detail Modal */}
       {selectedMovie && (
-        <MovieDetail 
-          movie={selectedMovie} 
-          onClose={handleCloseDetail} 
-        />
+        <MovieDetail movie={selectedMovie} onClose={handleCloseDetail} />
       )}
     </div>
   );

@@ -5,46 +5,66 @@ const SearchBar = ({ onSearch }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch(query);
+    if (query.trim()) {
+      onSearch(query);
+    }
   };
 
-  const handleClear = () => {
+   const handleClear = () => {
     setQuery('');
     onSearch('');
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="mb-8">
-      <div className="flex gap-2">
-        <div className="flex-1 relative">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cari film..."
-            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-            🔍
-          </span>
-        </div>
-        <button
-          type="submit"
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          Cari
-        </button>
-        {query && (
+    <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-2xl overflow-hidden">
+      {/* Background overlay */}
+      <div className="absolute inset-0 bg-black opacity-30"></div>
+      
+      {/* Hero Content */}
+      <div className="relative px-8 py-16 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          Welcome.
+        </h1>
+        <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+          Millions of movies, TV shows and people to discover. Explore now.
+        </p>
+        
+        {/* Search Form */}
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
+          <div className="flex bg-white rounded-full overflow-hidden shadow-lg">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Search for a movie, tv show, person......"
+              className="flex-1 px-6 py-4 text-gray-700 focus:outline-none text-lg"
+            />
+            <button
+              type="submit"
+              className="px-8 py-4 bg-gradient-to-r from-teal-400 to-blue-500 text-white font-semibold hover:from-teal-500 hover:to-blue-600 transition-all"
+            >
+              Search
+            </button>
+            {query && (
           <button
             type="button"
             onClick={handleClear}
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            className="px-8 py-4 bg-gradient-to-r from-teal-400 to-blue-500 text-white font-semibold hover:from-teal-500 hover:to-blue-600 transition-all"
           >
             Clear
           </button>
         )}
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   );
 };
 

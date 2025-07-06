@@ -2,12 +2,12 @@ import React from 'react';
 
 const Navigation = ({ activeTab, onTabChange }) => {
   const tabs = [
-    { id: 'popular', label: 'Popular', icon: '🔥' },
-    { id: 'search', label: 'Search', icon: '🔍' },
     { id: 'trending', label: 'Trending', icon: '📈' },
+    { id: 'search', label: 'Search', icon: '🔍' },
+    { id: 'popular', label: 'Popular', icon: '🔥' },
+    { id: 'upcoming', label: 'Upcoming', icon: '🚀' },
     { id: 'genres', label: 'Genres', icon: '🎭' },
     { id: 'top-rated', label: 'Top Rated', icon: '⭐' },
-    { id: 'upcoming', label: 'Upcoming', icon: '🚀' },
     { id: 'people', label: 'People', icon: '👥' },
   ];
 
