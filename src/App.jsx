@@ -87,6 +87,8 @@ function App() {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setSelectedMovie(null);
+    setSearchResults([]); // Reset hasil search saat pindah tab
+    setIsSearching(false);
 
     // Reset genre and load data according to tab
     if (tab !== TABS.GENRES) {
@@ -110,8 +112,13 @@ function App() {
   const handleHomeSearch = async (query) => {
     if (query.trim()) {
       setIsSearching(true);
-      await searchMovies(query);
-      setSearchResults(movies);
+      setSearchResults([]); // Reset sebelum search baru
+      try {
+        const data = await movieAPI.searchMovies(query);
+        setSearchResults(data.results || []);
+      } catch (err) {
+        setSearchResults([]);
+      }
       setIsSearching(false);
     } else {
       setSearchResults([]);
@@ -131,60 +138,58 @@ function App() {
   );
 
   const renderContent = () => {
+    // Hasil search hanya muncul di halaman utama (Trending)
+    if (activeTab === TABS.TRENDING) {
+      if (isSearching) {
+        return (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+          </div>
+        );
+      }
+      if (searchResults.length > 0) {
+        return (
+          <div className="space-y-6">
+            <SearchBar onSearch={handleHomeSearch} />
+            <h2 className="text-2xl font-bold text-gray-800">Search Results</h2>
+            <MovieList
+              movies={searchResults}
+              loading={false}
+              error={null}
+              onMovieClick={handleMovieClick}
+              title=""
+            />
+          </div>
+        );
+      }
+    }
+    // Default: tampilkan tab sesuai activeTab
     const contentMap = {
       [TABS.TRENDING]: () => (
         <div className="space-y-6">
           <SearchBar onSearch={handleHomeSearch} />
           <TrendingSection onMovieClick={handleMovieClick} />
-          
-          {/* Top Rated Movies dengan state terpisah */}
           <MovieListComponent 
             title="Top Rated Movies" 
             movies={topRatedMovies}
             loading={topRatedLoading}
             error={topRatedError}
           />
-          
-          {/* Upcoming Movies dengan state terpisah */}
           <MovieListComponent 
             title="Upcoming Movies" 
             movies={upcomingMovies}
             loading={upcomingLoading}
             error={upcomingError}
           />
-          
-          {/* Search Results */}
-          {isSearching && (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-            </div>
-          )}
-          {searchResults.length > 0 && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800">
-                Search Results
-              </h2>
-              <MovieList
-                movies={searchResults}
-                loading={false}
-                error={null}
-                onMovieClick={handleMovieClick}
-                title=""
-              />
-            </div>
-          )}
         </div>
       ),
-      
       [TABS.SEARCH]: () => (
         <div className="space-y-6">
           <SearchBar onSearch={searchMovies} />
           <MovieListComponent title="Search Results" />
         </div>
       ),
-
       [TABS.POPULAR]: () => <MovieListComponent title="Popular Movies" />,
-
       [TABS.GENRES]: () => (
         <div className="space-y-6">
           <GenreFilter
@@ -198,7 +203,6 @@ function App() {
           />
         </div>
       ),
-
       [TABS.TOP_RATED]: () => (
         <MovieListComponent 
           title="Top Rated Movies" 
@@ -207,7 +211,6 @@ function App() {
           error={topRatedError}
         />
       ),
-
       [TABS.UPCOMING]: () => (
         <MovieListComponent 
           title="Upcoming Movies" 
@@ -216,10 +219,8 @@ function App() {
           error={upcomingError}
         />
       ),
-
       [TABS.PEOPLE]: () => <PeopleList />,
     };
-
     return contentMap[activeTab]?.() || null;
   };
 
