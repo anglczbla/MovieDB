@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { movieAPI } from "../services/api";
-import { config } from "dotenv"; 
-config();
+
 
 export const useMovies = () => {
   const [movies, setMovies] = useState([]);
@@ -269,7 +268,7 @@ export const useMovies = () => {
   useEffect(() => {
     loadPopularMovies();
     loadGenres();
-    loadTrending;
+    loadTrending();
   }, [loadPopularMovies, loadGenres, loadTrending]);
 
   return {
