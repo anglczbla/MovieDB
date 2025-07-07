@@ -1,28 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { movieAPI } from '../services/api';
+import React from "react";
 
-const GenreFilter = ({ selectedGenre, onGenreSelect }) => {
-  const [genres, setGenres] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchGenres = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await movieAPI.getGenres();
-        setGenres(response.genres || []);
-      } catch (error) {
-        setError('Failed to load genres', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGenres();
-  }, []);
-
+const GenreFilter = ({
+  selectedGenre,
+  onGenreSelect,
+  genres,
+  loading,
+  error,
+}) => {
   if (loading) {
     return (
       <div className="flex justify-center py-8">
@@ -49,8 +33,8 @@ const GenreFilter = ({ selectedGenre, onGenreSelect }) => {
             onClick={() => onGenreSelect(genre)}
             className={`p-3 rounded-lg text-sm font-medium transition-colors ${
               selectedGenre?.id === genre.id
-                ? 'bg-yellow-500 text-gray-900'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                ? "bg-yellow-500 text-gray-900"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white"
             }`}
           >
             {genre.name}

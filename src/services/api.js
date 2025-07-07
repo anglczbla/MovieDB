@@ -18,6 +18,22 @@ export const movieAPI = {
     return response.json();
   },
 
+  // Ambil detail orang
+  getPersonDetails: async (personId) => {
+    const response = await fetch(
+      `${BASE_URL}/person/${personId}?api_key=${API_KEY}&language=en-US`
+    );
+    return response.json();
+  },
+
+  // Search orang
+  searchPeople: async (query, page = 1) => {
+    const response = await fetch(
+      `${BASE_URL}/search/person?api_key=${API_KEY}&query=${query}&language=en-US&page=${page}`
+    );
+    return response.json();
+  },
+
   // Detail film (enhanced with credits and videos)
   getMovieDetails: async (id) => {
     const response = await fetch(

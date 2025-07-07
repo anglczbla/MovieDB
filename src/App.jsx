@@ -25,6 +25,10 @@ function App() {
     movies,
     loading,
     error,
+    genres,
+    trendingPeople,
+    trendingLoading,
+    trendingError,
     searchMovies,
     loadMoviesByType,
     filterByGenre,
@@ -103,6 +107,7 @@ function App() {
   const handleGenreSelect = async (genre) => {
     setSelectedGenre(genre);
     setActiveTab(TABS.GENRES);
+    filterByGenre(genre.id);
 
     if (genre?.id) {
       await filterByGenre(genre.id);
@@ -117,7 +122,7 @@ function App() {
         const data = await movieAPI.searchMovies(query);
         setSearchResults(data.results || []);
       } catch (err) {
-        setSearchResults([]);
+        setSearchResults([], err);
       }
       setIsSearching(false);
     } else {
@@ -127,7 +132,12 @@ function App() {
   };
 
   // Component untuk movie list dengan props yang bisa dikustomisasi
-  const MovieListComponent = ({ title, movies: movieList, loading: isLoading, error: movieError }) => (
+  const MovieListComponent = ({
+    title,
+    movies: movieList,
+    loading: isLoading,
+    error: movieError,
+  }) => (
     <MovieList
       movies={movieList || movies}
       loading={isLoading !== undefined ? isLoading : loading}
@@ -169,14 +179,14 @@ function App() {
         <div className="space-y-6">
           <SearchBar onSearch={handleHomeSearch} />
           <TrendingSection onMovieClick={handleMovieClick} />
-          <MovieListComponent 
-            title="Top Rated Movies" 
+          <MovieListComponent
+            title="Top Rated Movies"
             movies={topRatedMovies}
             loading={topRatedLoading}
             error={topRatedError}
           />
-          <MovieListComponent 
-            title="Upcoming Movies" 
+          <MovieListComponent
+            title="Upcoming Movies"
             movies={upcomingMovies}
             loading={upcomingLoading}
             error={upcomingError}
@@ -195,6 +205,9 @@ function App() {
           <GenreFilter
             selectedGenre={selectedGenre}
             onGenreSelect={handleGenreSelect}
+            genres={genres} 
+            loading={loading} 
+            error={error} 
           />
           <MovieListComponent
             title={
@@ -204,22 +217,28 @@ function App() {
         </div>
       ),
       [TABS.TOP_RATED]: () => (
-        <MovieListComponent 
-          title="Top Rated Movies" 
+        <MovieListComponent
+          title="Top Rated Movies"
           movies={topRatedMovies}
           loading={topRatedLoading}
           error={topRatedError}
         />
       ),
       [TABS.UPCOMING]: () => (
-        <MovieListComponent 
-          title="Upcoming Movies" 
+        <MovieListComponent
+          title="Upcoming Movies"
           movies={upcomingMovies}
           loading={upcomingLoading}
           error={upcomingError}
         />
       ),
-      [TABS.PEOPLE]: () => <PeopleList />,
+      [TABS.PEOPLE]: () => (
+        <PeopleList
+          trendingPeople={trendingPeople} 
+          trendingLoading={trendingLoading} 
+          trendingError={trendingError} 
+        />
+      ),
     };
     return contentMap[activeTab]?.() || null;
   };

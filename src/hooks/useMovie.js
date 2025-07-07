@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { movieAPI } from "../services/api";
 
-
 export const useMovies = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +31,6 @@ export const useMovies = () => {
   const [creditsError, setCreditsError] = useState(null);
   const [detailError, setDetailError] = useState(null);
 
-  // Fungsi untuk memuat data, dibungkus dengan useCallback
   // Fungsi untuk memuat data trending
   const loadTrending = useCallback(async () => {
     try {
@@ -145,6 +143,19 @@ export const useMovies = () => {
     },
     [loadPopularMovies]
   );
+
+  const searchPeople = useCallback(async (query) => {
+    try {
+      if (query.trim() === "") {
+        return { results: [] };
+      }
+      const data = await movieAPI.searchPeople(query);
+      return data;
+    } catch (err) {
+      console.error("Gagal mencari orang:", err.message);
+      throw err;
+    }
+  }, []);
 
   const loadMoviesByType = useCallback(
     async (type) => {
@@ -295,6 +306,7 @@ export const useMovies = () => {
     creditsError,
     detailError,
     searchMovies,
+    searchPeople,
     loadPopularMovies,
     loadTopRatedMovies,
     loadUpcomingMovies,
