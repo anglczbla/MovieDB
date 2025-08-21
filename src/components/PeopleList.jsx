@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { movieAPI } from "../services/api";
 
 const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
@@ -38,11 +38,12 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
     }
   }, [page, isSearching]);
 
-  
   const searchPeople = async (query) => {
     if (query.trim() === "") {
       setIsSearching(false);
+      setPeople([]);
       setPage(1);
+      setLoading(false);
       return;
     }
 
@@ -51,30 +52,48 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
     setError(null);
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       const response = await movieAPI.searchPeople(query);
       setPeople(response.results || []);
     } catch (err) {
-      setError("Failed to search people", err);
+      setError("Failed to search people");
       setPeople([]);
+      console.error(err); 
     } finally {
       setLoading(false);
     }
   };
 
+  const debounceTimeout = useRef(null);
+
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
 
-    // Debounce search
-    const timeoutId = setTimeout(() => {
+    // Clear timeout sebelumnya
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    // Set timeout baru
+    debounceTimeout.current = setTimeout(() => {
       searchPeople(query);
     }, 500);
-
-    return () => clearTimeout(timeoutId);
   };
 
+  // Cleanup timeout saat component unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+    };
+  }, []);
+
   const loadMore = () => {
-    if (!isSearching) {
+    if (!isSearching && !loading) {
+      // Tambah check loading
       setPage((prev) => prev + 1);
     }
   };
