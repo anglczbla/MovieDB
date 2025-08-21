@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const SearchBar = ({ onSearch }) => {
   const [query, setQuery] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (query.trim()) {
-      onSearch(query);
-    }
+    onSearch(query);
   };
 
-   const handleClear = () => {
+  const handleClear = () => {
     setQuery('');
+    // Panggil onSearch dengan string kosong untuk trigger reset
     onSearch('');
   };
 
@@ -21,12 +20,16 @@ const SearchBar = ({ onSearch }) => {
     }
   };
 
+  // Reset query ketika di halaman utama
+  useEffect(() => {
+    // Jika ingin reset input ketika kembali ke home
+    // bisa tambahkan prop isHome dari parent
+  }, []);
+
   return (
     <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-2xl overflow-hidden">
-      {/* Background overlay */}
       <div className="absolute inset-0 bg-black opacity-30"></div>
       
-      {/* Hero Content */}
       <div className="relative px-8 py-16 text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
           Welcome.
@@ -35,7 +38,6 @@ const SearchBar = ({ onSearch }) => {
           Millions of movies, TV shows and people to discover. Explore now.
         </p>
         
-        {/* Search Form */}
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
           <div className="flex bg-white rounded-full overflow-hidden shadow-lg">
             <input
@@ -53,14 +55,14 @@ const SearchBar = ({ onSearch }) => {
               Search
             </button>
             {query && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className="px-8 py-4 bg-gradient-to-r from-teal-400 to-blue-500 text-white font-semibold hover:from-teal-500 hover:to-blue-600 transition-all"
-          >
-            Clear
-          </button>
-        )}
+              <button
+                type="button"
+                onClick={handleClear}
+                className="px-4 py-4 bg-gradient-to-r from-red-400 to-red-500 text-white font-semibold hover:from-red-500 hover:to-red-600 transition-all"
+              >
+                Clear
+              </button>
+            )}
           </div>
         </form>
       </div>
