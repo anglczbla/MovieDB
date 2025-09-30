@@ -51,12 +51,4 @@ To run the project locally, follow these steps:
    [http://localhost:5173](http://localhost:5173)
 
 
-```
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-> Created with ❤️ by [@anglczbla](https://github.com/anglczbla)
+## Created with ❤️ by [@anglczbla](https://github.com/anglczbla)
