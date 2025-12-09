@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
-import { useMovies } from "./hooks/useMovie";
-import SearchBar from "./components/SearchBar";
-import MovieList from "./components/MovieList";
-import MovieDetail from "./components/MovieDetail";
-import Navigation from "./components/Navigation";
+import { useCallback, useEffect, useState } from "react";
 import GenreFilter from "./components/GenreFilter";
+import MovieDetail from "./components/MovieDetail";
+import MovieList from "./components/MovieList";
+import Navigation from "./components/Navigation";
 import PeopleList from "./components/PeopleList";
+import SearchBar from "./components/SearchBar";
 import TrendingSection from "./components/TrendingSection";
+import { useMovies } from "./hooks/useMovie";
 import { movieAPI } from "./services/api";
 
 // Constants for tab names
@@ -47,6 +47,9 @@ function App() {
     searchMovies,
     loadMoviesByType,
     filterByGenre,
+    page,
+    totalPages,
+    changePage,
   } = useMovies();
 
   const [selectedMovie, setSelectedMovie] = useState(null);
@@ -54,7 +57,7 @@ function App() {
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [currentDataType, setCurrentDataType] = useState('trending');
+  const [currentDataType, setCurrentDataType] = useState("trending");
 
   // State terpisah untuk setiap jenis film (set initial loading ke false)
   const [topRatedMovies, setTopRatedMovies] = useState([]);
@@ -66,7 +69,11 @@ function App() {
 
   // Load data hanya saat tab trending pertama kali dibuka
   useEffect(() => {
-    if (activeTab === TABS.TRENDING && topRatedMovies.length === 0 && upcomingMovies.length === 0) {
+    if (
+      activeTab === TABS.TRENDING &&
+      topRatedMovies.length === 0 &&
+      upcomingMovies.length === 0
+    ) {
       loadTopRatedMovies();
       loadUpcomingMovies();
     }
@@ -74,7 +81,7 @@ function App() {
 
   const loadTopRatedMovies = async () => {
     if (topRatedLoading || topRatedMovies.length > 0) return; // Prevent duplicate calls
-    
+
     try {
       setTopRatedLoading(true);
       setTopRatedError(null);
@@ -89,7 +96,7 @@ function App() {
 
   const loadUpcomingMovies = async () => {
     if (upcomingLoading || upcomingMovies.length > 0) return; // Prevent duplicate calls
-    
+
     try {
       setUpcomingLoading(true);
       setUpcomingError(null);
@@ -130,7 +137,7 @@ function App() {
   const handleGenreSelect = async (genre) => {
     setSelectedGenre(genre);
     setActiveTab(TABS.GENRES);
-    setCurrentDataType('genres');
+    setCurrentDataType("genres");
 
     if (genre?.id) {
       await filterByGenre(genre.id);
@@ -138,63 +145,69 @@ function App() {
   };
 
   // Optimized handleSearch function
-  const handleSearch = useCallback(async (query) => {
-    if (!query || query.trim() === '') {
-      // Reset ke halaman utama
-      setSearchResults([]);
-      if (setMovies) setMovies([]);
-      setCurrentDataType('trending');
-      setIsSearching(false);
-      if (setError) setError(null);
-      return;
-    }
+  const handleSearch = useCallback(
+    async (query) => {
+      if (!query || query.trim() === "") {
+        // Reset ke halaman utama
+        setSearchResults([]);
+        if (setMovies) setMovies([]);
+        setCurrentDataType("trending");
+        setIsSearching(false);
+        if (setError) setError(null);
+        return;
+      }
 
-    setIsSearching(true);
-    if (setError) setError(null);
-    
-    try {
-      const data = await movieAPI.searchMovies(query.trim());
-      const results = data.results || [];
-      
-      // Update kedua state untuk konsistensi
-      setSearchResults(results);
-      if (setMovies) setMovies(results);
-      setCurrentDataType('search');
-    } catch (err) {
-      const errorMsg = `Gagal mencari film: ${err.message}`;
-      if (setError) setError(errorMsg);
-      setSearchResults([]);
-      if (setMovies) setMovies([]);
-    } finally {
-      setIsSearching(false);
-    }
-  }, [setMovies, setError]);
+      setIsSearching(true);
+      if (setError) setError(null);
+
+      try {
+        const data = await movieAPI.searchMovies(query.trim());
+        const results = data.results || [];
+
+        // Update kedua state untuk konsistensi
+        setSearchResults(results);
+        if (setMovies) setMovies(results);
+        setCurrentDataType("search");
+      } catch (err) {
+        const errorMsg = `Gagal mencari film: ${err.message}`;
+        if (setError) setError(errorMsg);
+        setSearchResults([]);
+        if (setMovies) setMovies([]);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [setMovies, setError]
+  );
 
   // Optimized handleHomeSearch
-  const handleHomeSearch = useCallback(async (query) => {
-    if (!query || query.trim() === '') {
-      setSearchResults([]);
-      setIsSearching(false);
-      setCurrentDataType('trending');
-      return;
-    }
+  const handleHomeSearch = useCallback(
+    async (query) => {
+      if (!query || query.trim() === "") {
+        setSearchResults([]);
+        setIsSearching(false);
+        setCurrentDataType("trending");
+        return;
+      }
 
-    setIsSearching(true);
-    if (setError) setError(null);
-    
-    try {
-      const data = await movieAPI.searchMovies(query.trim());
-      const results = data.results || [];
-      setSearchResults(results);
-      setCurrentDataType('search');
-    } catch (err) {
-      const errorMsg = `Gagal mencari film: ${err.message}`;
-      if (setError) setError(errorMsg);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  }, [setError]);
+      setIsSearching(true);
+      if (setError) setError(null);
+
+      try {
+        const data = await movieAPI.searchMovies(query.trim());
+        const results = data.results || [];
+        setSearchResults(results);
+        setCurrentDataType("search");
+      } catch (err) {
+        const errorMsg = `Gagal mencari film: ${err.message}`;
+        if (setError) setError(errorMsg);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [setError]
+  );
 
   // Component untuk movie list dengan props yang bisa dikustomisasi
   const MovieListComponent = ({
@@ -202,15 +215,21 @@ function App() {
     movies: movieList,
     loading: isLoading,
     error: movieError,
-  }) => (
-    <MovieList
-      movies={movieList || movies}
-      loading={isLoading !== undefined ? isLoading : loading}
-      error={movieError !== undefined ? movieError : error}
-      onMovieClick={handleMovieClick}
-      title={title}
-    />
-  );
+  }) => {
+    const isMainList = !movieList;
+    return (
+      <MovieList
+        movies={movieList || movies}
+        loading={isLoading !== undefined ? isLoading : loading}
+        error={movieError !== undefined ? movieError : error}
+        onMovieClick={handleMovieClick}
+        title={title}
+        page={isMainList ? page : undefined}
+        totalPages={isMainList ? totalPages : undefined}
+        onPageChange={isMainList ? changePage : undefined}
+      />
+    );
+  };
 
   const renderContent = () => {
     // Hasil search hanya muncul di halaman utama (Trending)
@@ -225,10 +244,10 @@ function App() {
       if (searchResults.length > 0) {
         return (
           <div className="space-y-6">
-            <SearchBar onSearch={handleHomeSearch}/>
-            <BackToHomeButton 
-              isVisible={currentDataType === 'search'} 
-              onClick={() => handleHomeSearch('')} 
+            <SearchBar onSearch={handleHomeSearch} />
+            <BackToHomeButton
+              isVisible={currentDataType === "search"}
+              onClick={() => handleHomeSearch("")}
             />
             <h2 className="text-2xl font-bold text-gray-800">Search Results</h2>
             <MovieList
@@ -265,9 +284,9 @@ function App() {
       [TABS.SEARCH]: () => (
         <div className="space-y-6">
           <SearchBar onSearch={searchMovies} />
-          <BackToHomeButton 
-            isVisible={currentDataType === 'search'} 
-            onClick={() => handleSearch('')} 
+          <BackToHomeButton
+            isVisible={currentDataType === "search"}
+            onClick={() => handleSearch("")}
           />
           <MovieListComponent title="Search Results" />
         </div>
@@ -278,9 +297,9 @@ function App() {
           <GenreFilter
             selectedGenre={selectedGenre}
             onGenreSelect={handleGenreSelect}
-            genres={genres} 
-            loading={loading} 
-            error={error} 
+            genres={genres}
+            loading={loading}
+            error={error}
           />
           <MovieListComponent
             title={
@@ -292,24 +311,20 @@ function App() {
       [TABS.TOP_RATED]: () => (
         <MovieListComponent
           title="Top Rated Movies"
-          movies={topRatedMovies}
-          loading={topRatedLoading}
-          error={topRatedError}
+          // Use global movies state which supports pagination
         />
       ),
       [TABS.UPCOMING]: () => (
         <MovieListComponent
           title="Upcoming Movies"
-          movies={upcomingMovies}
-          loading={upcomingLoading}
-          error={upcomingError}
+          // Use global movies state which supports pagination
         />
       ),
       [TABS.PEOPLE]: () => (
         <PeopleList
-          trendingPeople={trendingPeople} 
-          trendingLoading={trendingLoading} 
-          trendingError={trendingError} 
+          trendingPeople={trendingPeople}
+          trendingLoading={trendingLoading}
+          trendingError={trendingError}
         />
       ),
     };

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { movieAPI } from "../services/api";
 
 export const useMovies = () => {
@@ -7,6 +7,10 @@ export const useMovies = () => {
   const [error, setError] = useState(null);
   const [genres, setGenres] = useState([]);
   const [currentDataType, setCurrentDataType] = useState("popular");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentGenreId, setCurrentGenreId] = useState(null);
 
   // State untuk video, gambar, credits, trending dan detail
   const [movieVideos, setMovieVideos] = useState([]);
@@ -58,11 +62,13 @@ export const useMovies = () => {
     }
   }, []);
 
-  const loadPopularMovies = useCallback(async () => {
+  const loadPopularMovies = useCallback(async (pageParam = 1) => {
     try {
       setLoading(true);
-      const data = await movieAPI.getPopularMovies();
+      const data = await movieAPI.getPopularMovies(pageParam);
       setMovies(data.results);
+      setTotalPages(data.total_pages);
+      setPage(data.page);
       setCurrentDataType("popular");
       setError(null);
     } catch (err) {
@@ -72,11 +78,13 @@ export const useMovies = () => {
     }
   }, []);
 
-  const loadTopRatedMovies = useCallback(async () => {
+  const loadTopRatedMovies = useCallback(async (pageParam = 1) => {
     try {
       setLoading(true);
-      const data = await movieAPI.getTopRatedMovies();
+      const data = await movieAPI.getTopRatedMovies(pageParam);
       setMovies(data.results);
+      setTotalPages(data.total_pages);
+      setPage(data.page);
       setCurrentDataType("top-rated");
       setError(null);
     } catch (err) {
@@ -86,11 +94,13 @@ export const useMovies = () => {
     }
   }, []);
 
-  const loadUpcomingMovies = useCallback(async () => {
+  const loadUpcomingMovies = useCallback(async (pageParam = 1) => {
     try {
       setLoading(true);
-      const data = await movieAPI.getUpcomingMovies();
+      const data = await movieAPI.getUpcomingMovies(pageParam);
       setMovies(data.results);
+      setTotalPages(data.total_pages);
+      setPage(data.page);
       setCurrentDataType("upcoming");
       setError(null);
     } catch (err) {
@@ -109,12 +119,20 @@ export const useMovies = () => {
     }
   }, []);
 
-  const filterByGenre = useCallback(async (genreId) => {
+  const filterByGenre = useCallback(async (genreId, pageParam = 1) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await movieAPI.discoverByGenre(genreId);
+      // save genreId untuk pagination
+      setCurrentGenreId(genreId);
+
+      const data = await movieAPI.discoverMovies({
+        with_genres: genreId,
+        page: pageParam,
+      });
       setMovies(data.results);
+      setTotalPages(data.total_pages);
+      setPage(data.page);
       setCurrentDataType("genre");
     } catch (err) {
       setError(`Gagal memfilter film: ${err.message}`);
@@ -124,7 +142,7 @@ export const useMovies = () => {
   }, []);
 
   const searchMovies = useCallback(
-    async (query) => {
+    async (query, pageParam = 1) => {
       try {
         setLoading(true);
         setError(null);
@@ -132,8 +150,11 @@ export const useMovies = () => {
           loadPopularMovies();
           return;
         }
-        const data = await movieAPI.searchMovies(query);
+        setSearchQuery(query); // simpan query
+        const data = await movieAPI.searchMovies(query, pageParam);
         setMovies(data.results);
+        setTotalPages(data.total_pages);
+        setPage(data.page);
         setCurrentDataType("search");
       } catch (err) {
         setError(`Gagal mencari film: ${err.message}`);
@@ -158,19 +179,53 @@ export const useMovies = () => {
   }, []);
 
   const loadMoviesByType = useCallback(
-    async (type) => {
+    async (type, pageParam = 1) => {
       switch (type) {
         case "popular":
-          return loadPopularMovies();
+          return loadPopularMovies(pageParam);
         case "top-rated":
-          return loadTopRatedMovies();
+          return loadTopRatedMovies(pageParam);
         case "upcoming":
-          return loadUpcomingMovies();
+          return loadUpcomingMovies(pageParam);
         default:
-          return loadPopularMovies();
+          return loadPopularMovies(pageParam);
       }
     },
     [loadPopularMovies, loadTopRatedMovies, loadUpcomingMovies]
+  );
+
+  const changePage = useCallback(
+    (newPage) => {
+      if (newPage < 1 || newPage > totalPages) return;
+
+      switch (currentDataType) {
+        case "popular":
+        case "top-rated":
+        case "upcoming":
+          loadMoviesByType(currentDataType, newPage);
+          break;
+        case "genre":
+          if (currentGenreId) filterByGenre(currentGenreId, newPage);
+          break;
+        case "search":
+          if (searchQuery) searchMovies(searchQuery, newPage);
+          break;
+        default:
+          loadPopularMovies(newPage);
+      }
+      // scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [
+      currentDataType,
+      currentGenreId,
+      searchQuery,
+      loadMoviesByType,
+      filterByGenre,
+      searchMovies,
+      totalPages,
+      loadPopularMovies,
+    ]
   );
 
   const loadMovieVideos = useCallback(async (movieId) => {
@@ -319,5 +374,8 @@ export const useMovies = () => {
     loadMovieDetails,
     loadTrending,
     resetMovieMedia,
+    page,
+    totalPages,
+    changePage,
   };
 };

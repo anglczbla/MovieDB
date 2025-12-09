@@ -1,8 +1,9 @@
 import React from "react";
 
 const MovieCard = ({ movie, onClick }) => {
+  const imgBaseUrl = import.meta.env.VITE_APP_TMDB_IMG_BASE_URL || "https://image.tmdb.org/t/p/w500";
   const imageUrl = movie.poster_path
-    ? `${import.meta.env.VITE_APP_TMDB_IMG_BASE_URL}${movie.poster_path}`
+    ? `${imgBaseUrl}${movie.poster_path}`
     : "https://via.placeholder.com/300x450?text=No+Image";
 
   return (

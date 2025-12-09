@@ -1,16 +1,16 @@
-import React from 'react';
-import { ChevronLeft, ChevronRight, Star, Calendar } from 'lucide-react';
-import MovieCard from './MovieCard';
+import { Calendar, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import React from "react";
+import MovieCard from "./MovieCard";
 
 const MovieSection = ({ title, movies, onMovieClick, loading }) => {
   const scrollRef = React.useRef(null);
-  
+
   const scroll = (direction) => {
     if (scrollRef.current) {
       const scrollAmount = 400;
       scrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
       });
     }
   };
@@ -34,9 +34,7 @@ const MovieSection = ({ title, movies, onMovieClick, loading }) => {
     return (
       <div className="mb-8">
         <h2 className="text-xl font-bold text-gray-800 mb-4">{title}</h2>
-        <div className="text-gray-500 text-center py-8">
-          No movies found
-        </div>
+        <div className="text-gray-500 text-center py-8">No movies found</div>
       </div>
     );
   }
@@ -47,32 +45,29 @@ const MovieSection = ({ title, movies, onMovieClick, loading }) => {
         <h2 className="text-xl font-bold text-gray-800">{title}</h2>
         <div className="flex gap-2">
           <button
-            onClick={() => scroll('left')}
+            onClick={() => scroll("left")}
             className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
           >
             <ChevronLeft className="w-5 h-5 text-gray-600" />
           </button>
           <button
-            onClick={() => scroll('right')}
+            onClick={() => scroll("right")}
             className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
           >
             <ChevronRight className="w-5 h-5 text-gray-600" />
           </button>
         </div>
       </div>
-      
+
       <div className="relative">
-        <div 
+        <div
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide pb-4"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {movies.map((movie) => (
             <div key={movie.id} className="flex-shrink-0 w-64">
-              <MovieCard
-                movie={movie}
-                onClick={onMovieClick}
-              />
+              <MovieCard movie={movie} onClick={onMovieClick} />
             </div>
           ))}
         </div>
@@ -96,7 +91,7 @@ const HeroSection = ({ movies, onMovieClick }) => {
 
   const backdropUrl = featuredMovie.backdrop_path
     ? `https://image.tmdb.org/t/p/w1280${featuredMovie.backdrop_path}`
-    : 'https://via.placeholder.com/1280x720/374151/ffffff?text=No+Image';
+    : "https://via.placeholder.com/1280x720/374151/ffffff?text=No+Image";
   return (
     <div className="relative h-96 mb-8 rounded-xl overflow-hidden">
       <img
@@ -105,7 +100,7 @@ const HeroSection = ({ movies, onMovieClick }) => {
         className="w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-      
+
       <div className="absolute inset-0 flex items-center">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl">
@@ -146,7 +141,7 @@ const HeroSection = ({ movies, onMovieClick }) => {
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={`w-3 h-3 rounded-full transition-colors ${
-              index === currentIndex ? 'bg-white' : 'bg-white/50'
+              index === currentIndex ? "bg-white" : "bg-white/50"
             }`}
           />
         ))}
@@ -155,7 +150,16 @@ const HeroSection = ({ movies, onMovieClick }) => {
   );
 };
 
-const MovieList = ({ movies, loading, error, onMovieClick, title }) => {
+const MovieList = ({
+  movies,
+  loading,
+  error,
+  onMovieClick,
+  title,
+  page,
+  totalPages,
+  onPageChange,
+}) => {
   if (error) {
     return (
       <div className="text-center py-12">
@@ -178,13 +182,66 @@ const MovieList = ({ movies, loading, error, onMovieClick, title }) => {
       {showHero && movies.length > 0 && (
         <HeroSection movies={movies.slice(0, 5)} onMovieClick={onMovieClick} />
       )}
-      
+
       <MovieSection
         title={title}
         movies={movies}
         onMovieClick={onMovieClick}
         loading={loading}
       />
+
+      {totalPages > 1 && onPageChange && (
+        <div className="flex flex-wrap justify-center items-center gap-2 mt-8 pb-8">
+          <button
+            onClick={() => onPageChange(page - 1)}
+            disabled={page <= 1}
+            className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+              page <= 1
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 shadow-sm border border-gray-200"
+            }`}
+          >
+            Prev
+          </button>
+
+          {(() => {
+            const groupSize = 10;
+            const startPage =
+              Math.floor((page - 1) / groupSize) * groupSize + 1;
+            const endPage = Math.min(startPage + groupSize - 1, totalPages);
+            const pages = [];
+
+            for (let i = startPage; i <= endPage; i++) {
+              pages.push(
+                <button
+                  key={i}
+                  onClick={() => onPageChange(i)}
+                  className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+                    page === i
+                      ? "bg-blue-600 text-white shadow-md"
+                      : "bg-white text-gray-700 hover:bg-gray-50 shadow-sm border border-gray-200"
+                  }`}
+                >
+                  {i}
+                </button>
+              );
+            }
+            return pages;
+          })()}
+
+          <button
+            onClick={() => onPageChange(page + 1)}
+            disabled={page >= totalPages}
+            className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+              page >= totalPages
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 shadow-sm border border-gray-200"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
