@@ -18,11 +18,11 @@ const MovieSection = ({ title, movies, onMovieClick, loading }) => {
   if (loading) {
     return (
       <div className="mb-8">
-        <div className="h-6 bg-gray-300 rounded w-48 mb-4 animate-pulse"></div>
+        <div className="h-6 bg-[#1a1a1a] rounded w-48 mb-4 animate-pulse"></div>
         <div className="flex gap-4">
           {[...Array(6)].map((_, index) => (
-            <div key={index} className="flex-shrink-0 w-64 animate-pulse">
-              <div className="bg-gray-300 h-96 rounded-lg"></div>
+            <div key={index} className="flex-shrink-0 w-48 lg:w-56 animate-pulse">
+              <div className="bg-[#1a1a1a] h-72 rounded-xl"></div>
             </div>
           ))}
         </div>
@@ -32,29 +32,29 @@ const MovieSection = ({ title, movies, onMovieClick, loading }) => {
 
   if (!movies || movies.length === 0) {
     return (
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">{title}</h2>
-        <div className="text-gray-500 text-center py-8">No movies found</div>
+      <div className="mb-12">
+        <h2 className="text-2xl font-light text-white tracking-wide mb-4">{title}</h2>
+        <div className="text-gray-500 text-center py-8 font-light">No movies found</div>
       </div>
     );
   }
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+    <div className="mb-12">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-light text-white tracking-wide">{title}</h2>
         <div className="flex gap-2">
           <button
             onClick={() => scroll("left")}
-            className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+            className="p-2 bg-[#1a1a1a] rounded-full border border-white/5 hover:bg-white/10 transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <button
             onClick={() => scroll("right")}
-            className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+            className="p-2 bg-[#1a1a1a] rounded-full border border-white/5 hover:bg-white/10 transition-colors"
           >
-            <ChevronRight className="w-5 h-5 text-gray-600" />
+            <ChevronRight className="w-5 h-5 text-white" />
           </button>
         </div>
       </div>
@@ -66,7 +66,7 @@ const MovieSection = ({ title, movies, onMovieClick, loading }) => {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {movies.map((movie) => (
-            <div key={movie.id} className="flex-shrink-0 w-64">
+            <div key={movie.id} className="flex-shrink-0 w-48 lg:w-56">
               <MovieCard movie={movie} onClick={onMovieClick} />
             </div>
           ))}
@@ -93,32 +93,33 @@ const HeroSection = ({ movies, onMovieClick }) => {
     ? `https://image.tmdb.org/t/p/w1280${featuredMovie.backdrop_path}`
     : "https://via.placeholder.com/1280x720/374151/ffffff?text=No+Image";
   return (
-    <div className="relative h-96 mb-8 rounded-xl overflow-hidden">
+    <div className="relative h-[60vh] min-h-[400px] mb-12 rounded-2xl overflow-hidden group">
       <img
         src={backdropUrl}
         alt={featuredMovie.title}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
 
       <div className="absolute inset-0 flex items-center">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-8">
           <div className="max-w-2xl">
-            <h1 className="text-4xl font-bold text-white mb-4">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-white mb-4 tracking-tight leading-tight">
               {featuredMovie.title}
             </h1>
-            <p className="text-gray-200 text-lg mb-6 line-clamp-3">
+            <p className="text-gray-300 text-lg mb-8 line-clamp-3 font-light leading-relaxed">
               {featuredMovie.overview}
             </p>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-1 text-yellow-400">
-                <Star className="w-5 h-5 fill-current" />
-                <span className="text-white font-semibold">
+            <div className="flex items-center gap-6 mb-8 text-sm">
+              <div className="flex items-center gap-1.5 text-white">
+                <Star className="w-5 h-5 fill-white" />
+                <span className="font-medium">
                   {featuredMovie.vote_average?.toFixed(1)}
                 </span>
               </div>
               {featuredMovie.release_date && (
-                <div className="flex items-center gap-1 text-gray-300">
+                <div className="flex items-center gap-1.5 text-gray-400">
                   <Calendar className="w-5 h-5" />
                   {new Date(featuredMovie.release_date).getFullYear()}
                 </div>
@@ -126,22 +127,22 @@ const HeroSection = ({ movies, onMovieClick }) => {
             </div>
             <button
               onClick={() => onMovieClick(featuredMovie)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              className="bg-white text-black px-8 py-3.5 rounded-full font-medium hover:bg-gray-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)]"
             >
-              Watch Now
+              More Info
             </button>
           </div>
         </div>
       </div>
 
       {/* Indicators */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 z-10">
         {movies.slice(0, 5).map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full transition-colors ${
-              index === currentIndex ? "bg-white" : "bg-white/50"
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === currentIndex ? "bg-white w-6" : "bg-white/30 hover:bg-white/50"
             }`}
           />
         ))}
@@ -162,11 +163,11 @@ const MovieList = ({
 }) => {
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-red-500 text-lg mb-4">❌ {error}</div>
+      <div className="text-center py-16">
+        <div className="text-red-400 text-lg mb-6 font-light">{error}</div>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          className="px-6 py-2 border border-white/20 text-white rounded-full hover:bg-white/10 transition-colors"
         >
           Try Again
         </button>
@@ -178,7 +179,7 @@ const MovieList = ({
   const showHero = title === "Trending Movies" || title === "Popular Movies";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {showHero && movies.length > 0 && (
         <HeroSection movies={movies.slice(0, 5)} onMovieClick={onMovieClick} />
       )}
@@ -191,14 +192,14 @@ const MovieList = ({
       />
 
       {totalPages > 1 && onPageChange && (
-        <div className="flex flex-wrap justify-center items-center gap-2 mt-8 pb-8">
+        <div className="flex flex-wrap justify-center items-center gap-2 mt-12 pb-12">
           <button
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
-            className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               page <= 1
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50 shadow-sm border border-gray-200"
+                ? "text-gray-600 cursor-not-allowed"
+                : "text-white hover:bg-white/10"
             }`}
           >
             Prev
@@ -216,10 +217,10 @@ const MovieList = ({
                 <button
                   key={i}
                   onClick={() => onPageChange(i)}
-                  className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+                  className={`w-10 h-10 rounded-full text-sm font-medium transition-all ${
                     page === i
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "bg-white text-gray-700 hover:bg-gray-50 shadow-sm border border-gray-200"
+                      ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                      : "text-gray-400 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   {i}
@@ -232,10 +233,10 @@ const MovieList = ({
           <button
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
-            className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               page >= totalPages
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50 shadow-sm border border-gray-200"
+                ? "text-gray-600 cursor-not-allowed"
+                : "text-white hover:bg-white/10"
             }`}
           >
             Next

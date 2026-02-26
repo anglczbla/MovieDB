@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMovies } from "../hooks/useMovie";
+import { Star } from 'lucide-react';
 
 const TrendingSection = ({ onMovieClick }) => {
   const {
@@ -18,9 +19,9 @@ const TrendingSection = ({ onMovieClick }) => {
   }, [loadTrending]);
 
   const sections = [
-    { id: 'movies', label: 'Movies', icon: '🎬' },
-    { id: 'people', label: 'People', icon: '👥' },
-    { id: 'all', label: 'All', icon: '🌟' },
+    { id: 'movies', label: 'Movies' },
+    { id: 'people', label: 'People' },
+    { id: 'all', label: 'All' },
   ];
 
   const renderContent = () => {
@@ -44,14 +45,14 @@ const TrendingSection = ({ onMovieClick }) => {
         {data.map((item) => (
           <div
             key={item.id}
-            className="bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-700 transition-colors cursor-pointer"
+            className="group relative rounded-xl overflow-hidden bg-[#111] hover:shadow-xl hover:shadow-white/5 transition-all duration-300 cursor-pointer"
             onClick={() => {
               if (item.title && onMovieClick) {
                 onMovieClick(item);
               }
             }}
           >
-            <div className="w-full h-auto object-contain">
+            <div className="w-full h-auto aspect-[2/3] overflow-hidden">
               <img
                 src={
                   item.poster_path || item.profile_path
@@ -59,33 +60,29 @@ const TrendingSection = ({ onMovieClick }) => {
                     : '/placeholder-movie.jpg'
                 }
                 alt={item.title || item.name}
-                className="w-full h-auto object-contain"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 onError={(e) => {
                   e.target.src = '/placeholder-movie.jpg';
                 }}
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
-            <div className="p-4">
-              <h3 className="font-semibold text-white truncate">
+            <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+              <h3 className="font-medium text-white line-clamp-1">
                 {item.title || item.name}
               </h3>
-              {item.title && ( // Hanya tampilkan untuk film
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-sm text-gray-200">
+              {item.title && (
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-xs text-gray-300 font-light">
                     {item.release_date?.split('-')[0] || 'N/A'}
                   </span>
-                  <div className="flex items-center">
-                    <span className="text-yellow-400 mr-1">⭐</span>
-                    <span className="text-sm text-gray-100">
+                  <div className="flex items-center gap-1 text-xs text-white">
+                    <Star size={12} className="fill-white text-white" />
+                    <span className="font-medium">
                       {item.vote_average?.toFixed(1) || 'N/A'}
                     </span>
                   </div>
                 </div>
-              )}
-              {item.media_type && (
-                <span className="inline-block bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded mt-2">
-                  {item.media_type}
-                </span>
               )}
             </div>
           </div>
@@ -96,8 +93,8 @@ const TrendingSection = ({ onMovieClick }) => {
 
   if (trendingLoading) {
     return (
-      <div className="flex justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div>
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
       </div>
     );
   }
@@ -105,28 +102,27 @@ const TrendingSection = ({ onMovieClick }) => {
   if (trendingError) {
     return (
       <div className="text-center py-8">
-        <p className="text-red-500">{trendingError}</p>
+        <p className="text-red-400 font-light">{trendingError}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-yellow-400">Trending Today</h2>
-        <div className="flex space-x-2">
+    <div className="space-y-8 mb-16">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <h2 className="text-2xl font-light text-white tracking-wide">Trending Today</h2>
+        <div className="flex bg-[#1a1a1a] p-1 rounded-full border border-white/5">
           {sections.map((section) => (
             <button
               key={section.id}
               onClick={() => setActiveSection(section.id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
                 activeSection === section.id
-                  ? 'bg-yellow-500 text-gray-900'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
-              <span>{section.icon}</span>
-              <span>{section.label}</span>
+              {section.label}
             </button>
           ))}
         </div>
