@@ -118,8 +118,8 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
 
   if (displayLoading) {
     return (
-      <div className="flex justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div>
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
       </div>
     );
   }
@@ -133,9 +133,9 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 mb-16">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-2xl font-bold text-yellow-400">
+        <h2 className="text-2xl font-light text-white tracking-wide">
           {searchQuery.trim() !== "" ? "Search Results" : "Popular People"}
         </h2>
         <div className="relative">
@@ -144,7 +144,7 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
             placeholder="Search people..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="w-full md:w-64 px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-yellow-500 focus:outline-none"
+            className="w-full md:w-64 px-4 py-2 bg-[#1a1a1a] text-white font-light rounded-full border border-white/10 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/5 transition-all"
           />
           {searchQuery && (
             <button
@@ -218,11 +218,11 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
         people.length > 0 &&
         searchQuery.trim() === "" &&
         trendingPeople.length === 0 && (
-          <div className="text-center">
+          <div className="text-center mt-12">
             <button
               onClick={loadMore}
               disabled={loading}
-              className="bg-yellow-500 text-gray-900 px-6 py-2 rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "Loading..." : "Load More"}
             </button>

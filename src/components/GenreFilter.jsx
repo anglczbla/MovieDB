@@ -9,8 +9,8 @@ const GenreFilter = ({
 }) => {
   if (loading) {
     return (
-      <div className="flex justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div>
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
       </div>
     );
   }
@@ -24,17 +24,17 @@ const GenreFilter = ({
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-yellow-400">Select Genre</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+    <div className="space-y-6 mb-12">
+      <h2 className="text-2xl font-light text-white tracking-wide">Select Genre</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {genres.map((genre) => (
           <button
             key={genre.id}
             onClick={() => onGenreSelect(genre)}
-            className={`p-3 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 border ${
               selectedGenre?.id === genre.id
-                ? "bg-yellow-500 text-gray-900"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white"
+                ? "bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                : "bg-[#111] text-gray-400 border-white/5 hover:bg-[#1a1a1a] hover:text-white hover:border-white/20"
             }`}
           >
             {genre.name}

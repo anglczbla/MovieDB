@@ -144,8 +144,8 @@ const MovieDetail = ({ movie, onClose }) => {
 
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-white/20 transition-all">
                 <div className="flex items-center mb-2">
-                  <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-yellow-400 font-bold text-sm">⭐</span>
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white font-bold text-sm">⭐</span>
                   </div>
                   <div>
                     <h4 className="font-semibold text-white text-sm">Rating</h4>
@@ -447,7 +447,7 @@ const MovieDetail = ({ movie, onClose }) => {
                       <h4 className="font-semibold text-white text-xs mb-1 truncate">{cast.name}</h4>
                       <p className="text-gray-300 text-xs truncate">{cast.character}</p>
                       <div className="flex items-center mt-1">
-                        <span className="text-yellow-400 text-xs">⭐</span>
+                        <span className="text-white text-xs">⭐</span>
                         <span className="text-gray-300 text-xs ml-1">
                           {cast.popularity ? Math.round(cast.popularity) : "N/A"}
                         </span>
@@ -511,7 +511,7 @@ const MovieDetail = ({ movie, onClose }) => {
                 </p>
               )}
               <div className="flex items-center space-x-3 text-sm">
-                <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-3 py-1 rounded-full font-bold shadow-lg">
+                <span className="bg-white text-black px-3 py-1 rounded-full font-bold shadow-[0_0_10px_rgba(255,255,255,0.3)]">
                   {movie.vote_average?.toFixed(1) || "N/A"}
                 </span>
                 <span className="text-white/95">{formatDate(movie.release_date)}</span>
