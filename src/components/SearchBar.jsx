@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
-import { movieAPI } from '../services/api';
+import { Search, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { movieAPI } from "../services/api";
 
 const SearchBar = ({ onSearch, isHero = false }) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [bgImage, setBgImage] = useState(null);
 
   useEffect(() => {
@@ -12,9 +12,14 @@ const SearchBar = ({ onSearch, isHero = false }) => {
         try {
           const data = await movieAPI.getTrendingMoviesDay();
           if (data.results && data.results.length > 0) {
-            const randomMovie = data.results[Math.floor(Math.random() * Math.min(5, data.results.length))];
+            const randomMovie =
+              data.results[
+                Math.floor(Math.random() * Math.min(5, data.results.length))
+              ];
             if (randomMovie.backdrop_path) {
-              setBgImage(`https://image.tmdb.org/t/p/original${randomMovie.backdrop_path}`);
+              setBgImage(
+                `https://image.tmdb.org/t/p/original${randomMovie.backdrop_path}`,
+              );
             }
           }
         } catch (error) {
@@ -31,12 +36,12 @@ const SearchBar = ({ onSearch, isHero = false }) => {
   };
 
   const handleClear = () => {
-    setQuery('');
-    onSearch('');
+    setQuery("");
+    onSearch("");
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSubmit(e);
     }
   };
@@ -47,9 +52,9 @@ const SearchBar = ({ onSearch, isHero = false }) => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           {bgImage && (
-            <img 
-              src={bgImage} 
-              alt="Background" 
+            <img
+              src={bgImage}
+              alt="Background"
               className="w-full h-full object-cover opacity-30 object-top"
             />
           )}
@@ -68,7 +73,10 @@ const SearchBar = ({ onSearch, isHero = false }) => {
           <form onSubmit={handleSubmit} className="w-full relative group">
             <div className="flex items-center bg-[#1a1a1a]/90 backdrop-blur-md rounded-full border border-white/20 overflow-hidden shadow-2xl shadow-black/50 transition-all duration-300 focus-within:border-white/50 focus-within:ring-4 focus-within:ring-white/10">
               <div className="pl-6 pr-2 text-gray-400">
-                <Search size={22} className="opacity-70 group-focus-within:opacity-100 transition-opacity" />
+                <Search
+                  size={22}
+                  className="opacity-70 group-focus-within:opacity-100 transition-opacity"
+                />
               </div>
               <input
                 type="text"
@@ -100,13 +108,18 @@ const SearchBar = ({ onSearch, isHero = false }) => {
     );
   }
 
-  // Standard SearchBar for other pages
   return (
     <div className="relative mb-10 mt-4">
-      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto relative group">
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-3xl mx-auto relative group"
+      >
         <div className="flex items-center bg-[#1a1a1a] rounded-full border border-white/10 overflow-hidden shadow-lg transition-all duration-300 focus-within:border-white/30 focus-within:ring-2 focus-within:ring-white/5">
           <div className="pl-6 pr-2 text-gray-400">
-            <Search size={20} className="opacity-70 group-focus-within:opacity-100 transition-opacity" />
+            <Search
+              size={20}
+              className="opacity-70 group-focus-within:opacity-100 transition-opacity"
+            />
           </div>
           <input
             type="text"
