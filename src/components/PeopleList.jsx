@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import { Star } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { movieAPI } from "../services/api";
 
 const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
@@ -11,7 +12,7 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
 
   // Filter trending people based on search query
   const filteredTrendingPeople = trendingPeople.filter((person) =>
-    person.name.toLowerCase().includes(searchQuery.toLowerCase())
+    person.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Load popular people for pagination
@@ -59,7 +60,7 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
     } catch (err) {
       setError("Failed to search people");
       setPeople([]);
-      console.error(err); 
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -93,20 +94,18 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
 
   const loadMore = () => {
     if (!isSearching && !loading) {
-      // Tambah check loading
       setPage((prev) => prev + 1);
     }
   };
 
-  // Use trending people if available and not searching
   const displayPeople =
     searchQuery.trim() === "" && !isSearching
       ? trendingPeople.length > 0
         ? trendingPeople
         : people
       : isSearching
-      ? people
-      : filteredTrendingPeople;
+        ? people
+        : filteredTrendingPeople;
 
   const displayLoading =
     searchQuery.trim() === "" && !isSearching
@@ -153,7 +152,7 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
                 setIsSearching(false);
                 setPage(1);
               }}
-              className="absolute right-2 top-2 text-gray-400 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
             >
               ✕
             </button>
@@ -163,7 +162,7 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
 
       {displayPeople.length === 0 && !displayLoading ? (
         <div className="text-center py-8">
-          <p className="text-gray-400">
+          <p className="text-gray-400 font-light">
             {searchQuery.trim() !== ""
               ? "No people found for your search."
               : "No people available."}
@@ -174,46 +173,49 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
           {displayPeople.map((person) => (
             <div
               key={person.id}
-              className="bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-700 transition-colors cursor-pointer"
+              className="group relative rounded-xl overflow-hidden bg-[#111] hover:shadow-xl hover:shadow-white/5 transition-all duration-300 cursor-pointer"
             >
-              <div className="aspect-w-3 aspect-h-4">
+              <div className="w-full h-auto aspect-[2/3] overflow-hidden">
                 <img
                   src={
                     person.profile_path
                       ? `https://image.tmdb.org/t/p/w500${person.profile_path}`
-                      : "/placeholder-person.jpg"
+                      : "/placeholder-person.jpg" // You can rely on standard placeholder
                   }
                   alt={person.name}
-                  className="w-full h-64 object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => {
                     e.target.src = "/placeholder-person.jpg";
+                    e.target.onerror = null;
                   }}
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-white truncate">
+              <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                <h3 className="font-medium text-white line-clamp-1">
                   {person.name}
                 </h3>
-                <p className="text-gray-400 text-sm">
-                  Popularity: {person.popularity?.toFixed(1)}
-                </p>
-                {person.known_for && person.known_for.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-500">Known for:</p>
-                    <p className="text-sm text-gray-300 truncate">
-                      {person.known_for
-                        .map((item) => item.title || item.name)
-                        .join(", ")}
-                    </p>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-xs text-gray-300 font-light line-clamp-1">
+                    {person.known_for && person.known_for.length > 0
+                      ? person.known_for
+                          .map((item) => item.title || item.name)
+                          .join(", ")
+                      : "Actor"}
+                  </span>
+                  <div className="flex items-center gap-1 text-xs text-white shrink-0 ml-2">
+                    <Star size={12} className="fill-white text-white" />
+                    <span className="font-medium">
+                      {person.popularity?.toFixed(1) || "N/A"}
+                    </span>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Load More button - only show when not searching and using paginated data */}
       {!isSearching &&
         people.length > 0 &&
         searchQuery.trim() === "" &&
@@ -222,7 +224,7 @@ const PeopleList = ({ trendingPeople, trendingLoading, trendingError }) => {
             <button
               onClick={loadMore}
               disabled={loading}
-              className="px-8 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-8 py-3 bg-[#1a1a1a] border border-white/10 text-white rounded-full font-light hover:bg-white hover:text-black hover:border-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "Loading..." : "Load More"}
             </button>
