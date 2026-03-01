@@ -1,8 +1,9 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
-const Navigation = ({ activeTab, onTabChange }) => {
+const Navigation = () => {
   const tabs = [
-    { id: 'trending', label: 'Trending' },
+    { id: '', label: 'Trending' },
     { id: 'popular', label: 'Popular' },
     { id: 'upcoming', label: 'Upcoming' },
     { id: 'genres', label: 'Genres' },
@@ -15,20 +16,27 @@ const Navigation = ({ activeTab, onTabChange }) => {
       <div className="container mx-auto px-6">
         <div className="flex w-full space-x-8 py-4 overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => (
-            <button
+            <NavLink
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={`whitespace-nowrap pb-1 text-sm font-medium transition-all duration-300 relative ${
-                activeTab === tab.id
-                  ? 'text-white'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
+              to={`/${tab.id}`}
+              className={({ isActive }) =>
+                `whitespace-nowrap pb-1 text-sm font-medium transition-all duration-300 relative ${
+                  isActive
+                    ? 'text-white'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`
+              }
+              end={tab.id === ''}
             >
-              {tab.label}
-              {activeTab === tab.id && (
-                <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-white rounded-t-full shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
+              {({ isActive }) => (
+                <>
+                  {tab.label}
+                  {isActive && (
+                    <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-white rounded-t-full shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
+                  )}
+                </>
               )}
-            </button>
+            </NavLink>
           ))}
         </div>
       </div>
