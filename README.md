@@ -18,8 +18,9 @@ MovieDB is a simple and modern movie search application built using React and Vi
 - Tailwind CSS
 
 ## 📸 Screenshot
-![image](https://github.com/user-attachments/assets/21378398-e533-43f2-af86-d06ff484c70f)
-![image](https://github.com/user-attachments/assets/80e2d9fc-c481-4039-a26d-ac2c5aa1402f)
+<img width="1877" height="789" alt="image" src="https://github.com/user-attachments/assets/a507ee32-cfdb-49ce-b4bb-159338b8cab1" />
+<img width="1842" height="838" alt="image" src="https://github.com/user-attachments/assets/f6044e63-c66c-47a2-a2b5-0109cb065e14" />
+<img width="1852" height="840" alt="image" src="https://github.com/user-attachments/assets/c22cc2f6-9861-427c-8355-0699a8ec59fc" />
 
 
 ## 🔧 Getting Started
